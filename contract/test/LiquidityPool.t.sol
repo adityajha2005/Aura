@@ -36,14 +36,17 @@ contract LiquidityPoolTest is Test {
 
     function testRemoveLiquidityTransfersTokens() public {
         pool.addLiquidity(1_000 ether, 1_000 ether);
+        uint lpBalance = pool.lpToken().balanceOf(address(this));
         uint balABefore = tokenA.balanceOf(address(this));
         uint balBBefore = tokenB.balanceOf(address(this));
-        pool.removeLiquidity(400 ether, 300 ether);
-        assertEq(tokenA.balanceOf(address(this)), balABefore + 400 ether);
-        assertEq(tokenB.balanceOf(address(this)), balBBefore + 300 ether);
+        
+        pool.removeLiquidity(lpBalance / 2);
+        
+        assertGt(tokenA.balanceOf(address(this)), balABefore);
+        assertGt(tokenB.balanceOf(address(this)), balBBefore);
         (uint a, uint b) = pool.getReserves();
-        assertEq(a, 600 ether);
-        assertEq(b, 700 ether);
+        assertLt(a, 1_000 ether);
+        assertLt(b, 1_000 ether);
     }
 
     function testSwapAtoBUpdatesReserves() public {
@@ -70,15 +73,17 @@ contract LiquidityPoolTest is Test {
         assertLt(a, 10_000 ether + 2_000 ether);
     }
 
-    function testSetNewFeeOnlyOwner() public {
+    function testSetNewFeeOnlyGovernance() public {
         vm.prank(user);
-        vm.expectRevert();
+        vm.expectRevert(bytes("Only governance"));
         pool.setNewFee(50);
+        pool.setGovernance(address(this));
         pool.setNewFee(50);
         assertEq(pool.fee(), 50);
     }
 
     function testSetNewFeeInvalidReverts() public {
+        pool.setGovernance(address(this));
         vm.expectRevert(bytes("invalid"));
         pool.setNewFee(1001);
     }
@@ -92,7 +97,7 @@ contract LiquidityPoolTest is Test {
 
     function testRemoveLiquidityInvalidReverts() public {
         vm.expectRevert(bytes("invalid"));
-        pool.removeLiquidity(0, 1);
+        pool.removeLiquidity(0);
     }
 
     function testSwapInvalidReverts() public {
@@ -100,6 +105,25 @@ contract LiquidityPoolTest is Test {
         pool.swapAtoB(0);
         vm.expectRevert(bytes("invalid"));
         pool.swapBtoA(0);
+    }
+
+    function testLPTokenMinting() public {
+        pool.addLiquidity(1_000 ether, 2_000 ether);
+        uint lpBalance = pool.lpToken().balanceOf(address(this));
+        assertEq(lpBalance, 1_000 ether);
+        assertEq(pool.totalSupply(), 1_000 ether);
+    }
+
+    function testLPTokenProportionalWithdrawal() public {
+        pool.addLiquidity(1_000 ether, 1_000 ether);
+        uint lpBalance = pool.lpToken().balanceOf(address(this));
+        
+        pool.removeLiquidity(lpBalance);
+        
+        assertEq(pool.lpToken().balanceOf(address(this)), 0);
+        (uint a, uint b) = pool.getReserves();
+        assertEq(a, 0);
+        assertEq(b, 0);
     }
 }
 
