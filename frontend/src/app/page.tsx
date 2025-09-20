@@ -147,13 +147,15 @@ export default function Home() {
               className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-2 rounded-full text-white mr-4 hover:bg-white/20 transition-all duration-300"
               style={{
                 boxShadow:
-                  "inset 6px 0 16px rgba(255, 255, 255, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1)",
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
             >
               Lets Start Now
             </button>
 
-            <GlowButton variant="red" className="px-6 py-2">Join Us</GlowButton>
+            <GlowButton variant="red" className="px-6 py-2">
+              Join Us
+            </GlowButton>
           </div>
         </div>
 
@@ -165,7 +167,7 @@ export default function Home() {
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-4 w-64 relative overflow-hidden transform rotate-6 -translate-y-28 translate-x-36 z-50"
               style={{
                 boxShadow:
-                  "inset 4px 0 16px rgba(255, 255, 255, 0.1), 0 4px 6px rgba(0, 0, 0, 0.2)",
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
             >
               <div className="flex items-center justify-between">
@@ -240,7 +242,7 @@ export default function Home() {
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-4 w-64 relative overflow-hidden transform -rotate-6  -translate-x-30"
               style={{
                 boxShadow:
-                  "inset -4px 0 16px rgba(239, 68, 68, 0.2), 0 4px 6px rgba(0, 0, 0, 0.2)",
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
             >
               <div className="flex items-center justify-between">

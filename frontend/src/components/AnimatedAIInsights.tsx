@@ -69,10 +69,10 @@ export function AnimatedAIInsights() {
     switch (type) {
       case "positive":
         return {
-          text: "text-red-400",
-          bg: "bg-red-800/20",
-          border: "border-red-400/30",
-          icon: "text-red-300",
+          text: "text-emerald-400",
+          bg: "bg-emerald-500/20",
+          border: "border-emerald-400/30",
+          icon: "text-emerald-300",
         };
       case "warning":
         return {
@@ -83,10 +83,10 @@ export function AnimatedAIInsights() {
         };
       case "active":
         return {
-          text: "text-gray-300",
-          bg: "bg-gray-700/20",
-          border: "border-gray-400/30",
-          icon: "text-gray-200",
+          text: "text-blue-400",
+          bg: "bg-blue-500/20",
+          border: "border-blue-400/30",
+          icon: "text-blue-300",
         };
       default:
         return {
@@ -100,7 +100,7 @@ export function AnimatedAIInsights() {
 
   return (
     <motion.div
-      className="relative bg-gradient-to-br from-gray-900/50 via-black/40 to-red-900/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden group"
+      className="relative bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden group"
       whileHover={{ scale: 1.02 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -121,7 +121,7 @@ export function AnimatedAIInsights() {
                 cy="20"
                 r="1"
                 fill="currentColor"
-                className="text-red-400"
+                className="text-blue-400"
               >
                 <animate
                   attributeName="opacity"
@@ -135,7 +135,7 @@ export function AnimatedAIInsights() {
                 cy="5"
                 r="0.5"
                 fill="currentColor"
-                className="text-gray-400"
+                className="text-emerald-400"
               >
                 <animate
                   attributeName="opacity"
@@ -154,7 +154,7 @@ export function AnimatedAIInsights() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <motion.div
-              className="w-2 h-2 bg-red-400 rounded-full"
+              className="w-2 h-2 bg-emerald-400 rounded-full"
               animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
@@ -163,15 +163,15 @@ export function AnimatedAIInsights() {
 
           {/* AI Status Indicator */}
           <motion.div
-            className="flex items-center gap-2 px-3 py-1 bg-red-800/20 border border-red-400/30 rounded-full"
+            className="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 rounded-full"
             animate={{ opacity: isUpdating ? 0.5 : 1 }}
           >
             <motion.div
-              className="w-1.5 h-1.5 bg-red-400 rounded-full"
+              className="w-1.5 h-1.5 bg-emerald-400 rounded-full"
               animate={{ scale: [1, 1.3, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
-            <span className="text-red-300 text-xs font-medium">
+            <span className="text-emerald-300 text-xs font-medium">
               {isUpdating ? "Analyzing..." : "Active"}
             </span>
           </motion.div>
@@ -230,9 +230,9 @@ export function AnimatedAIInsights() {
                   <motion.div
                     className={`p-1 rounded ${
                       insight.trend === "up"
-                        ? "text-red-400"
+                        ? "text-emerald-400"
                         : insight.trend === "down"
-                        ? "text-gray-500"
+                        ? "text-red-400"
                         : "text-gray-400"
                     }`}
                     animate={{

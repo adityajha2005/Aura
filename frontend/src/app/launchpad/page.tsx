@@ -4,19 +4,33 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatEther, parseEther } from "viem";
 import toast from "react-hot-toast";
-import { useLaunchpad, useCreateTokenAndLaunch, useContribute, useLaunchManagement, LaunchFormData } from "@/hooks/useLaunchpad";
+import {
+  useLaunchpad,
+  useCreateTokenAndLaunch,
+  useContribute,
+  useLaunchManagement,
+  LaunchFormData,
+} from "@/hooks/useLaunchpad";
 import { LaunchCard } from "@/components/LaunchCard";
 import GlowButton from "@/components/ui/glow-button";
 
 export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");
   const [showCreateForm, setShowCreateForm] = useState(false);
-  
+
   const { address } = useAccount();
   const { launches, launchCount, loading, error, refetch } = useLaunchpad();
-  const { createTokenAndLaunch, isPending: isCreating, isSuccess: isCreateSuccess } = useCreateTokenAndLaunch();
+  const {
+    createTokenAndLaunch,
+    isPending: isCreating,
+    isSuccess: isCreateSuccess,
+  } = useCreateTokenAndLaunch();
   const { contribute, isPending: isContributing } = useContribute();
-  const { finalizeLaunch, cancelLaunch, isPending: isManaging } = useLaunchManagement();
+  const {
+    finalizeLaunch,
+    cancelLaunch,
+    isPending: isManaging,
+  } = useLaunchManagement();
 
   const [formData, setFormData] = useState<LaunchFormData>({
     name: "",
@@ -48,7 +62,7 @@ export default function LaunchpadPage() {
   }, [isCreateSuccess, refetch]);
 
   const handleFormChange = (field: keyof LaunchFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleCreateLaunch = async () => {
@@ -58,7 +72,12 @@ export default function LaunchpadPage() {
     }
 
     // Validate form data
-    if (!formData.name || !formData.symbol || !formData.totalSupply || !formData.pricePerToken) {
+    if (
+      !formData.name ||
+      !formData.symbol ||
+      !formData.totalSupply ||
+      !formData.pricePerToken
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -143,7 +162,13 @@ export default function LaunchpadPage() {
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             {["projects", "launch", "security"].map((tab) => (
               <button
                 key={tab}
@@ -167,12 +192,13 @@ export default function LaunchpadPage() {
               <h2 className="text-2xl font-semibold text-white">
                 Active & Upcoming Projects ({launchCount})
               </h2>
-              <button 
-                onClick={() => setShowCreateForm(true)}
-              
-              >
-
-                <GlowButton variant="red"   className=" text-white px-6 py-2 rounded-full transition-all duration-300">Create Launch</GlowButton>
+              <button onClick={() => setShowCreateForm(true)}>
+                <GlowButton
+                  variant="red"
+                  className=" text-white px-6 py-2 rounded-full transition-all duration-300"
+                >
+                  Create Launch
+                </GlowButton>
               </button>
             </div>
 
@@ -184,8 +210,10 @@ export default function LaunchpadPage() {
 
             {error && (
               <div className="text-center py-8">
-                <div className="text-red-400 mb-4">Error loading launches: {error}</div>
-                <button 
+                <div className="text-red-400 mb-4">
+                  Error loading launches: {error}
+                </div>
+                <button
                   onClick={() => refetch()}
                   className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white px-6 py-2 rounded-full transition-all duration-300"
                 >
@@ -196,7 +224,9 @@ export default function LaunchpadPage() {
 
             {!loading && !error && launches.length === 0 && (
               <div className="text-center py-8">
-                <div className="text-gray-300">No launches found. Be the first to launch a project!</div>
+                <div className="text-gray-300">
+                  No launches found. Be the first to launch a project!
+                </div>
               </div>
             )}
 
@@ -238,7 +268,13 @@ export default function LaunchpadPage() {
         {/* Launch Tab */}
         {selectedTab === "launch" && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Launch Your Project
               </h2>
@@ -266,7 +302,9 @@ export default function LaunchpadPage() {
                       type="text"
                       placeholder="e.g., TOKEN"
                       value={formData.symbol}
-                      onChange={(e) => handleFormChange("symbol", e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        handleFormChange("symbol", e.target.value.toUpperCase())
+                      }
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
@@ -279,7 +317,9 @@ export default function LaunchpadPage() {
                       type="number"
                       placeholder="Total token supply"
                       value={formData.totalSupply}
-                      onChange={(e) => handleFormChange("totalSupply", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("totalSupply", e.target.value)
+                      }
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
@@ -293,7 +333,9 @@ export default function LaunchpadPage() {
                       step="0.000001"
                       placeholder="Price in AVAX"
                       value={formData.pricePerToken}
-                      onChange={(e) => handleFormChange("pricePerToken", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("pricePerToken", e.target.value)
+                      }
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
@@ -309,7 +351,9 @@ export default function LaunchpadPage() {
                       step="0.001"
                       placeholder="Minimum contribution"
                       value={formData.minContribution}
-                      onChange={(e) => handleFormChange("minContribution", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("minContribution", e.target.value)
+                      }
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
@@ -323,7 +367,9 @@ export default function LaunchpadPage() {
                       step="0.001"
                       placeholder="Maximum contribution"
                       value={formData.maxContribution}
-                      onChange={(e) => handleFormChange("maxContribution", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("maxContribution", e.target.value)
+                      }
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
@@ -332,9 +378,11 @@ export default function LaunchpadPage() {
                     <label className="text-gray-300 text-sm mb-2 block">
                       Launch Duration (Days)
                     </label>
-                    <select 
+                    <select
                       value={formData.duration}
-                      onChange={(e) => handleFormChange("duration", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("duration", e.target.value)
+                      }
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30"
                     >
                       <option value="1">1 day</option>
@@ -359,12 +407,16 @@ export default function LaunchpadPage() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleCreateLaunch}
                 disabled={isCreating || !address}
                 className="w-full mt-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all duration-300"
               >
-                {isCreating ? "Creating Launch..." : !address ? "Connect Wallet to Launch" : "Create Token & Launch"}
+                {isCreating
+                  ? "Creating Launch..."
+                  : !address
+                  ? "Connect Wallet to Launch"
+                  : "Create Token & Launch"}
               </button>
             </div>
           </div>
@@ -373,7 +425,13 @@ export default function LaunchpadPage() {
         {/* Security Tab */}
         {selectedTab === "security" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h3 className="text-2xl font-semibold text-white mb-6">
                 AI Security Features
               </h3>
@@ -454,7 +512,13 @@ export default function LaunchpadPage() {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h3 className="text-2xl font-semibold text-white mb-6">
                 Security Stats
               </h3>
@@ -486,7 +550,13 @@ export default function LaunchpadPage() {
       {/* Create Launch Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-white">
                 Create Token & Launch
@@ -495,8 +565,18 @@ export default function LaunchpadPage() {
                 onClick={() => setShowCreateForm(false)}
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -524,7 +604,9 @@ export default function LaunchpadPage() {
                     type="text"
                     placeholder="e.g., TOKEN"
                     value={formData.symbol}
-                    onChange={(e) => handleFormChange("symbol", e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      handleFormChange("symbol", e.target.value.toUpperCase())
+                    }
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                   />
                 </div>
@@ -539,7 +621,9 @@ export default function LaunchpadPage() {
                     type="number"
                     placeholder="Total token supply"
                     value={formData.totalSupply}
-                    onChange={(e) => handleFormChange("totalSupply", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("totalSupply", e.target.value)
+                    }
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                   />
                 </div>
@@ -553,7 +637,9 @@ export default function LaunchpadPage() {
                     step="0.000001"
                     placeholder="Price in AVAX"
                     value={formData.pricePerToken}
-                    onChange={(e) => handleFormChange("pricePerToken", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("pricePerToken", e.target.value)
+                    }
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                   />
                 </div>
@@ -569,7 +655,9 @@ export default function LaunchpadPage() {
                     step="0.001"
                     placeholder="Minimum contribution"
                     value={formData.minContribution}
-                    onChange={(e) => handleFormChange("minContribution", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("minContribution", e.target.value)
+                    }
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                   />
                 </div>
@@ -583,7 +671,9 @@ export default function LaunchpadPage() {
                     step="0.001"
                     placeholder="Maximum contribution"
                     value={formData.maxContribution}
-                    onChange={(e) => handleFormChange("maxContribution", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("maxContribution", e.target.value)
+                    }
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                   />
                 </div>
@@ -593,7 +683,7 @@ export default function LaunchpadPage() {
                 <label className="text-gray-300 text-sm mb-2 block">
                   Launch Duration (Days)
                 </label>
-                <select 
+                <select
                   value={formData.duration}
                   onChange={(e) => handleFormChange("duration", e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30"
@@ -625,12 +715,16 @@ export default function LaunchpadPage() {
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleCreateLaunch}
                   disabled={isCreating || !address}
                   className="flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all duration-300"
                 >
-                  {isCreating ? "Creating..." : !address ? "Connect Wallet" : "Create & Launch"}
+                  {isCreating
+                    ? "Creating..."
+                    : !address
+                    ? "Connect Wallet"
+                    : "Create & Launch"}
                 </button>
               </div>
             </div>
