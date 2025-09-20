@@ -1,14 +1,20 @@
+import NOSCommitmentSection from "@/components/Commitement";
 import PhoneComponent from "@/components/phone-component";
 import GlowButton from "@/components/ui/glow-button";
+import Why from "@/components/Why";
+import { ArrowRight, ChevronRight } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Static 3D Glass Cards */}
-      <div className="absolute inset-0 z-0" style={{ perspective: "1000px" }}>
+      <div
+        className="absolute top-[20%] left-0 right-0 z-0"
+        style={{ perspective: "1000px" }}
+      >
         {/* Card 1 - Far left */}
         <div
-          className="absolute left-8 w-48 h-64 bg-white/2 backdrop-blur-sm rounded-xl border border-white/5 shadow-2xl"
+          className="absolute left-6 w-48 mt-16 h-64 bg-white/2 backdrop-blur-sm rounded-xl border border-white/5 shadow-2xl"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
@@ -21,7 +27,7 @@ export default function Home() {
 
         {/* Card 2 - Left */}
         <div
-          className="absolute left-54 w-52 h-68 bg-white/3 backdrop-blur-md rounded-lg border border-white/6 shadow-xl"
+          className="absolute left-52 w-52 mt-8 h-68 bg-white/3 backdrop-blur-md rounded-lg border border-white/6 shadow-xl"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
@@ -34,7 +40,7 @@ export default function Home() {
 
         {/* Card 3 - Center left */}
         <div
-          className="absolute left-103 w-56 h-72 bg-white/2 backdrop-blur-lg rounded-2xl border border-white/5 shadow-2xl"
+          className="absolute left-101 w-56 h-72 bg-white/2 backdrop-blur-lg rounded-2xl border border-white/5 shadow-2xl"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
@@ -72,7 +78,7 @@ export default function Home() {
 
         {/* Card 6 - Right */}
         <div
-          className="absolute right-52 w-52 h-68 bg-white/2 backdrop-blur-lg rounded-xl border border-white/6 shadow-xl"
+          className="absolute right-52 w-52 mt-8 h-68 bg-white/2 backdrop-blur-lg rounded-xl border border-white/6 shadow-xl"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
@@ -85,7 +91,7 @@ export default function Home() {
 
         {/* Card 7 - Far right */}
         <div
-          className="absolute right-8 w-44 h-60 bg-white/3 backdrop-blur-sm rounded-2xl border border-white/6 shadow-2xl"
+          className="absolute right-8 w-44 h-60 mt-16 bg-white/3 backdrop-blur-sm rounded-2xl border border-white/6 shadow-2xl"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
@@ -98,8 +104,14 @@ export default function Home() {
       </div>
 
       {/* Main content container */}
-      <div className="h-screen flex flex-col items-center justify-between text-center text-white z-20 relative mt-26 py-20">
+      <div className="relative h-screen flex flex-col items-center justify-between text-center text-white z-20 relative mt-8 py-20">
         {/* Hero Section */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 mb-8">
+          <span className="text-red-100 font-medium flex justify-center items-center gap-2">
+            Aura Protocol <ArrowRight className="h-4 w-4 " />
+          </span>
+        </div>
+
         <div className="flex-1 flex  flex-col items-center justify-center">
           <div
             className="text-6xl font-medium mb-6"
@@ -141,7 +153,7 @@ export default function Home() {
               Lets Start Now
             </button>
 
-            <GlowButton variant="red">Join Us</GlowButton>
+            <GlowButton variant="red" className="px-6 py-2">Join Us</GlowButton>
           </div>
         </div>
 
@@ -198,7 +210,7 @@ export default function Home() {
             {/* Phone Component */}
             <div className="flex justify-center relative">
               {/* AURA text behind phone - horizontal layout */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-170 -translate-y-1/2 z-0">
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-170 -translate-y-1/2 z-0">
                 <div
                   className="flex gap-8 text-white text-[250px] font-bold select-none opacity-50"
                   style={{
@@ -207,7 +219,6 @@ export default function Home() {
                 >
                   <span className="text-red-700/90">A</span>
                   <span>U</span>
-                  
                 </div>
               </div>
               <div className="absolute top-1/2 left-1/2 transform translate-x-80 -translate-y-1/2 z-0">
@@ -217,7 +228,6 @@ export default function Home() {
                     fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
                   }}
                 >
-                
                   <span>R</span>
                   <span>A</span>
                 </div>
@@ -268,6 +278,14 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="relative z-20 w-full mt-40">
+        <Why />
+      </div>
+
+      <div className="relative z-20 w-full -mt-20">
+        <NOSCommitmentSection />
       </div>
     </div>
   );

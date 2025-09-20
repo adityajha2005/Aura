@@ -17,6 +17,7 @@ import {
   type CancelEscrowParams,
 } from '@/hooks/useMagicLinkEscrow';
 import { CONTRACT_ADDRESSES } from '@/config/contracts';
+import GlowButton from './ui/glow-button';
 
 // Token options for the escrow
 const TOKEN_OPTIONS = [
@@ -207,9 +208,12 @@ function EscrowCard({
               <button
                 onClick={() => setShowClaimForm(true)}
                 disabled={isDemoMode}
-                className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+             
               >
+                <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
                 {isDemoMode ? "Demo Mode" : "Claim Escrow"}
+                </GlowButton>
+
               </button>
             ) : (
               <div className="space-y-2">
@@ -225,9 +229,11 @@ function EscrowCard({
                   <button
                     onClick={handleClaim}
                     disabled={isClaiming || !secret.trim() || isDemoMode}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                    
                   >
+                    <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
                     {isDemoMode ? "Demo Mode" : isClaiming ? "Claiming..." : "Claim"}
+                    </GlowButton>
                   </button>
                   <button
                     onClick={() => setShowClaimForm(false)}
@@ -246,17 +252,21 @@ function EscrowCard({
             <button
               onClick={handleCancel}
               disabled={isCancelling || isDemoMode}
-              className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+              
             >
+              <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
               {isDemoMode ? "Demo Mode" : isCancelling ? "Cancelling..." : "Cancel Escrow"}
+              </GlowButton>
             </button>
             {isExpired && (
               <button
                 onClick={handleExpire}
                 disabled={isExpiring || isDemoMode}
-                className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                
               >
+                <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
                 {isDemoMode ? "Demo Mode" : isExpiring ? "Expiring..." : "Expire Escrow"}
+                </GlowButton>
               </button>
             )}
           </div>
@@ -684,14 +694,16 @@ export default function MagicLinkEscrow() {
                 <button
                   onClick={handleCreateEscrow}
                   disabled={isCreating || isConfirmingCreate || !formData.amount || !formData.secret || isDemoMode}
-                  className="w-full bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all duration-300"
+                 className='flex w-full justify-center'
                 >
+                  <GlowButton variant="red"    className="w-full flex justify-center items-center disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
                   {isDemoMode 
                     ? "Demo Mode" 
                     : isCreating || isConfirmingCreate 
                     ? "Creating Escrow..." 
                     : "Create Magic Link Escrow"
                   }
+                  </GlowButton>
                 </button>
 
                 {/* Error Display */}
@@ -840,14 +852,16 @@ export default function MagicLinkEscrow() {
                     !claimFormData.secret || 
                     isDemoMode
                   }
-                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all duration-300"
+                  className="w-full flex justify-center"
                 >
-                  {isDemoMode 
+                   <GlowButton variant="red"  className="w-full flex justify-center items-center disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">{isDemoMode 
                     ? "Demo Mode" 
                     : isClaiming || isConfirmingClaim 
                     ? "Claiming Escrow..." 
                     : "🎁 Claim Tokens"
-                  }
+                  }</GlowButton>
+                  
+                    
                 </button>
 
                 {/* Error Display */}

@@ -30,10 +30,12 @@ function Header() {
     }
   };
   return (
-    <header className="fixed w-full h-16 z-20 bg-transparent backdrop-blur-2xl flex items-center justify-between px-8  ">
+    <header className="fixed w-full py-10  h-16 z-20 bg-transparent backdrop-blur-2xl flex items-center justify-between px-8  z-50 backdrop-blur-3xl border-b border-white/9 flex items-center justify-between px-8 rounded-full shadow-b-lg ">
       {/* Logo */}
       <div className="flex items-center">
-        <div className="text-white text-2xl font-bold">
+        <div className="text-white text-2xl font-bold"  style={{
+                fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
+              }}>
           <span className="text-red-800">A</span>URA
         </div>
       </div>
