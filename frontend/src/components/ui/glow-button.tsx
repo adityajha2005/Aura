@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { ChevronDown, Notebook } from "lucide-react";
 import React from "react";
 
 enum VaraintColor {
@@ -12,12 +11,10 @@ enum VaraintColor {
 const GlowButton = ({
   children,
   variant = VaraintColor.orange,
-  disableChevron = false,
   className,
 }: {
   children: React.ReactNode;
   variant?: string;
-  disableChevron?: boolean;
   className?: string;
 }) => {
   return (

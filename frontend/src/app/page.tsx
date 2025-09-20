@@ -217,7 +217,7 @@ export default function Home() {
                     fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
                   }}
                 >
-                 
+                
                   <span>R</span>
                   <span>A</span>
                 </div>
