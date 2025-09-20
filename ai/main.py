@@ -208,7 +208,7 @@ async def recommend_fee(
             reasoning=recommendation["reasoning"],
             market_condition=recommendation["market_condition"],
             current_volatility=recommendation.get("current_volatility", 0),
-            timestamp=recommendation["timestamp"]
+            timestamp=recommendation.get("prediction_timestamp", datetime.now().isoformat())
         )
         
     except Exception as e:

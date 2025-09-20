@@ -87,23 +87,47 @@ export default function GovernancePage() {
 
         {/* User Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="text-2xl font-bold text-white mb-1">
               {userTokens.toLocaleString()}
             </div>
             <div className="text-gray-300 text-sm">AURA Tokens</div>
           </div>
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="text-2xl font-bold text-purple-400 mb-1">
               {votingPower.toFixed(3)}%
             </div>
             <div className="text-gray-300 text-sm">Voting Power</div>
           </div>
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="text-2xl font-bold text-green-400 mb-1">7</div>
             <div className="text-gray-300 text-sm">Votes Cast</div>
           </div>
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="text-2xl font-bold text-blue-400 mb-1">2</div>
             <div className="text-gray-300 text-sm">Proposals Created</div>
           </div>
@@ -111,7 +135,13 @@ export default function GovernancePage() {
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             {["proposals", "create", "delegate"].map((tab) => (
               <button
                 key={tab}
@@ -135,6 +165,10 @@ export default function GovernancePage() {
               <div
                 key={proposal.id}
                 className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+                style={{
+                  boxShadow:
+                    "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+                }}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
@@ -233,7 +267,13 @@ export default function GovernancePage() {
         {/* Create Tab */}
         {selectedTab === "create" && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Create New Proposal
               </h2>
@@ -338,7 +378,13 @@ export default function GovernancePage() {
         {selectedTab === "delegate" && (
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+              <div
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+                style={{
+                  boxShadow:
+                    "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+                }}
+              >
                 <h3 className="text-2xl font-semibold text-white mb-6">
                   Delegate Your Votes
                 </h3>
@@ -377,7 +423,13 @@ export default function GovernancePage() {
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+              <div
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+                style={{
+                  boxShadow:
+                    "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+                }}
+              >
                 <h3 className="text-2xl font-semibold text-white mb-6">
                   Top Delegates
                 </h3>

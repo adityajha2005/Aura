@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { AnimatedAIInsights } from "../../components/AnimatedAIInsights";
+import Image from "next/image";
 import { InteractiveChart } from "../../components/InteractiveChart";
+import AIFeeRecommendation from "@/components/AIFeeRecommendation";
+import AIMarketInsights from "@/components/AIMarketInsights";
+import AIGovernanceIntegration from "@/components/AIGovernanceIntegration";
 
 import GlowButton from "@/components/ui/glow-button";
 
@@ -13,7 +16,6 @@ export default function AIDexPage() {
   return (
     <div className="min-h-screen relative overflow-hidden pt-20">
       {/* Enhanced Animated Background */}
- 
 
       {/* Static 3D Glass Cards Background */}
       <div className="absolute inset-0 z-10" style={{ perspective: "1000px" }}>
@@ -134,7 +136,13 @@ export default function AIDexPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1, duration: 0.4 }}
               >
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
+                <div
+                  className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+                  style={{
+                    boxShadow:
+                      "inset 4px 4px 16px rgba(239, 68, 68, 0.1), inset -4px -4px 16px rgba(239, 68, 68, 0.1)",
+                  }}
+                >
                   <h3 className="text-2xl font-semibold text-white mb-6">
                     Swap Tokens
                   </h3>
@@ -150,14 +158,26 @@ export default function AIDexPage() {
                     </label>
                     <motion.div
                       className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center hover:bg-white/10 transition-all duration-300"
+                      style={{
+                        boxShadow:
+                          "inset 2px 2px 8px rgba(239, 68, 68, 0.08), inset -2px -2px 8px rgba(239, 68, 68, 0.08)",
+                      }}
                       whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex items-center gap-3">
                         <motion.div
-                          className="w-8 h-8 bg-blue-500 rounded-full"
+                          className="w-8 h-8 rounded-full overflow-hidden"
                           whileHover={{ rotate: 360 }}
                           transition={{ duration: 0.5 }}
-                        />
+                        >
+                          <Image
+                            src="/avax.png"
+                            alt="AVAX"
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                          />
+                        </motion.div>
                         <span className="text-white font-medium">AVAX</span>
                       </div>
                       <motion.input
@@ -178,6 +198,10 @@ export default function AIDexPage() {
                   >
                     <motion.button
                       className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-full p-2 transition-all duration-300"
+                      style={{
+                        boxShadow:
+                          "inset 2px 2px 8px rgba(239, 68, 68, 0.1), inset -2px -2px 8px rgba(239, 68, 68, 0.1)",
+                      }}
                       whileHover={{ rotate: 180, scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
@@ -208,6 +232,10 @@ export default function AIDexPage() {
                     </label>
                     <motion.div
                       className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center hover:bg-white/10 transition-all duration-300"
+                      style={{
+                        boxShadow:
+                          "inset 2px 2px 8px rgba(239, 68, 68, 0.08), inset -2px -2px 8px rgba(239, 68, 68, 0.08)",
+                      }}
                       whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex items-center gap-3">
@@ -228,38 +256,12 @@ export default function AIDexPage() {
                   </motion.div>
                   {/* AI Fee Display */}
                   <motion.div
-                    className="bg-gradient-to-r from-red-900/20 via-black/20 to-gray-800/20 border border-red-800/30 rounded-xl p-4 mb-6 backdrop-blur-sm"
+                    className="mb-6"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5, duration: 0.3 }}
-                    whileHover={{ scale: 1.02 }}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <motion.div
-                        className="w-2 h-2 bg-red-400 rounded-full"
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      />
-                      <span className="text-red-300 text-sm font-medium">
-                        AI-Optimized Fee
-                      </span>
-                    </div>
-                    <motion.div
-                      className="text-white text-lg font-semibold"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.7, duration: 0.3 }}
-                    >
-                      0.15% (Dynamic)
-                    </motion.div>
-                    <motion.div
-                      className="text-gray-300 text-xs"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.8, duration: 0.3 }}
-                    >
-                      Fee reduced due to high liquidity
-                    </motion.div>
+                    <AIFeeRecommendation showDetails={false} />
                   </motion.div>
                   {/* Enhanced Swap Button */}
                   <motion.div
@@ -303,8 +305,6 @@ export default function AIDexPage() {
                       </GlowButton>
                     </motion.div>
 
-                   
-
                     {/* Particle effects on hover */}
                     <motion.div className="absolute inset-0 pointer-events-none">
                       {[...Array(6)].map((_, i) => (
@@ -341,14 +341,18 @@ export default function AIDexPage() {
               >
                 {/* Assets Balance Card */}
                 <motion.div
-                  className="relative bg-gradient-to-br from-red-900/20 via-black/40 to-gray-800/20 backdrop-blur-md border border-red-800/20 rounded-2xl p-6 overflow-hidden group"
+                  className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 overflow-hidden group"
+                  style={{
+                    boxShadow:
+                      "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+                  }}
                   whileHover={{ scale: 1.02 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
                 >
                   {/* Gradient overlay effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 via-transparent to-gray-400/10 group-hover:from-red-400/20 group-hover:to-gray-400/20 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 group-hover:from-red-500/10 group-hover:to-red-600/10 transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2">
@@ -369,10 +373,10 @@ export default function AIDexPage() {
                     </motion.div>
                     <div className="flex gap-3">
                       <motion.button
-                        className="px-6 py-2 bg-red-800/80 hover:bg-red-700 text-white rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden group"
+                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden group"
                         whileHover={{
                           scale: 1.05,
-                          boxShadow: "0 8px 25px rgba(185, 28, 28, 0.4)",
+                          boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)",
                         }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -385,7 +389,7 @@ export default function AIDexPage() {
                         <span className="relative z-10">Stake</span>
                       </motion.button>
                       <motion.button
-                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300 relative overflow-hidden group"
+                        className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300 relative overflow-hidden group"
                         whileHover={{
                           scale: 1.05,
                           borderColor: "rgba(255, 255, 255, 0.4)",
@@ -407,14 +411,18 @@ export default function AIDexPage() {
 
                 {/* Pool Balance Card */}
                 <motion.div
-                  className="relative bg-gradient-to-br from-gray-800/20 via-black/40 to-red-900/20 backdrop-blur-md border border-gray-700/20 rounded-2xl p-6 overflow-hidden group"
+                  className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 overflow-hidden group"
+                  style={{
+                    boxShadow:
+                      "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+                  }}
                   whileHover={{ scale: 1.02 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.4 }}
                 >
                   {/* Gradient overlay effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-400/10 via-transparent to-red-400/10 group-hover:from-gray-400/20 group-hover:to-red-400/20 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 group-hover:from-red-500/10 group-hover:to-red-600/10 transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2">
@@ -434,7 +442,7 @@ export default function AIDexPage() {
                       $1,900
                     </motion.div>
                     <motion.button
-                      className="px-6 py-2 bg-transparent hover:bg-red-800/20 text-red-400 rounded-full text-sm font-medium border border-red-400/50 hover:border-red-400 transition-all duration-300"
+                      className="px-6 py-2 bg-transparent hover:bg-white/10 text-white rounded-full text-sm font-medium border border-white/30 hover:border-white/50 transition-all duration-300"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -445,14 +453,18 @@ export default function AIDexPage() {
 
                 {/* Claimable Card */}
                 <motion.div
-                  className="relative bg-gradient-to-br from-gray-700/20 via-black/40 to-red-800/20 backdrop-blur-md border border-gray-600/20 rounded-2xl p-6 overflow-hidden group"
+                  className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 overflow-hidden group"
+                  style={{
+                    boxShadow:
+                      "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+                  }}
                   whileHover={{ scale: 1.02 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.4 }}
                 >
                   {/* Gradient overlay effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-400/10 via-transparent to-red-400/10 group-hover:from-gray-400/20 group-hover:to-red-400/20 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 group-hover:from-red-500/10 group-hover:to-red-600/10 transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2">
@@ -496,7 +508,7 @@ export default function AIDexPage() {
             >
               <InteractiveChart />
 
-              <AnimatedAIInsights />
+              <AIMarketInsights />
             </motion.div>
           )}
 
@@ -504,64 +516,72 @@ export default function AIDexPage() {
           {selectedTab === "fees" && (
             <motion.div
               key="fees"
-              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              whileHover={{ scale: 1.01 }}
             >
-              <motion.h3
-                className="text-2xl font-semibold text-white mb-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.3 }}
+              {/* Dynamic Fee Structure */}
+              <motion.div
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+                whileHover={{ scale: 1.01 }}
               >
-                Dynamic Fee Structure
-              </motion.h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  {
-                    rate: "0.05%",
-                    label: "Low Volatility",
-                    color: "text-gray-400",
-                    delay: 0.1,
-                  },
-                  {
-                    rate: "0.15%",
-                    label: "Current Rate",
-                    color: "text-yellow-400",
-                    delay: 0.2,
-                  },
-                  {
-                    rate: "0.30%",
-                    label: "High Volatility",
-                    color: "text-red-400",
-                    delay: 0.3,
-                  },
-                ].map((fee, index) => (
-                  <motion.div
-                    key={fee.label}
-                    className="text-center"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + fee.delay, duration: 0.4 }}
-                    whileHover={{ scale: 1.1, y: -5 }}
-                  >
+                <motion.h3
+                  className="text-2xl font-semibold text-white mb-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                >
+                  Dynamic Fee Structure
+                </motion.h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      rate: "0.05%",
+                      label: "Low Volatility",
+                      color: "text-green-400",
+                      delay: 0.1,
+                    },
+                    {
+                      rate: "0.15%",
+                      label: "Current Rate",
+                      color: "text-yellow-400",
+                      delay: 0.2,
+                    },
+                    {
+                      rate: "0.30%",
+                      label: "High Volatility",
+                      color: "text-red-400",
+                      delay: 0.3,
+                    },
+                  ].map((fee, index) => (
                     <motion.div
-                      className={`text-3xl font-bold ${fee.color} mb-2`}
-                      animate={{ scale: index === 1 ? [1, 1.05, 1] : 1 }}
-                      transition={{
-                        duration: 2,
-                        repeat: index === 1 ? Infinity : 0,
-                      }}
+                      key={fee.label}
+                      className="text-center"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + fee.delay, duration: 0.4 }}
+                      whileHover={{ scale: 1.1, y: -5 }}
                     >
-                      {fee.rate}
+                      <motion.div
+                        className={`text-3xl font-bold ${fee.color} mb-2`}
+                        animate={{ scale: index === 1 ? [1, 1.05, 1] : 1 }}
+                        transition={{
+                          duration: 2,
+                          repeat: index === 1 ? Infinity : 0,
+                        }}
+                      >
+                        {fee.rate}
+                      </motion.div>
+                      <div className="text-gray-300">{fee.label}</div>
                     </motion.div>
-                    <div className="text-gray-300">{fee.label}</div>
-                  </motion.div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* AI Governance Integration */}
+              <AIGovernanceIntegration />
             </motion.div>
           )}
         </AnimatePresence>

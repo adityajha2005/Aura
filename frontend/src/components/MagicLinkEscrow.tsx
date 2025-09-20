@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
-import { formatEther } from 'viem';
+import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { formatEther } from "viem";
 import {
   useMagicLinkEscrow,
   useCreateEscrow,
@@ -15,15 +15,27 @@ import {
   type CreateEscrowParams,
   type ClaimEscrowParams,
   type CancelEscrowParams,
-} from '@/hooks/useMagicLinkEscrow';
-import { CONTRACT_ADDRESSES } from '@/config/contracts';
-import GlowButton from './ui/glow-button';
+} from "@/hooks/useMagicLinkEscrow";
+import { CONTRACT_ADDRESSES } from "@/config/contracts";
+import GlowButton from "./ui/glow-button";
 
 // Token options for the escrow
 const TOKEN_OPTIONS = [
-  { symbol: 'AVAX', address: '0x0000000000000000000000000000000000000000', color: 'bg-red-500' },
-  { symbol: 'TEST', address: CONTRACT_ADDRESSES.TestTokens, color: 'bg-blue-500' },
-  { symbol: 'AGOV', address: CONTRACT_ADDRESSES.AuraGovernanceToken, color: 'bg-purple-500' },
+  {
+    symbol: "AVAX",
+    address: "0x0000000000000000000000000000000000000000",
+    color: "bg-red-500",
+  },
+  {
+    symbol: "TEST",
+    address: CONTRACT_ADDRESSES.TestTokens,
+    color: "bg-blue-500",
+  },
+  {
+    symbol: "AGOV",
+    address: CONTRACT_ADDRESSES.AuraGovernanceToken,
+    color: "bg-purple-500",
+  },
 ];
 
 // Simple EscrowPreview component
@@ -31,45 +43,62 @@ function EscrowPreview({ escrowId }: { escrowId: number }) {
   const { escrowDetails, isLoading, error } = useEscrowDetails(escrowId);
 
   const getTokenSymbol = (tokenAddress: string) => {
-    const token = TOKEN_OPTIONS.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-    return token ? token.symbol : 'Unknown';
+    const token = TOKEN_OPTIONS.find(
+      (t) => t.address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    return token ? token.symbol : "Unknown";
   };
 
   if (isLoading) {
-    return <div className="text-gray-300 text-sm">Loading escrow details...</div>;
+    return (
+      <div className="text-gray-300 text-sm">Loading escrow details...</div>
+    );
   }
 
   if (error || !escrowDetails) {
-    return <div className="text-red-300 text-sm">Failed to load escrow details</div>;
+    return (
+      <div className="text-red-300 text-sm">Failed to load escrow details</div>
+    );
   }
 
   const isExpired = Date.now() / 1000 > Number(escrowDetails.expirationTime);
-  const status = escrowDetails.claimed ? "Claimed" : 
-                escrowDetails.cancelled ? "Cancelled" : 
-                isExpired ? "Expired" : "Active";
+  const status = escrowDetails.claimed
+    ? "Claimed"
+    : escrowDetails.cancelled
+    ? "Cancelled"
+    : isExpired
+    ? "Expired"
+    : "Active";
 
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
         <span className="text-gray-300">Amount:</span>
         <span className="text-white">
-          {formatEther(escrowDetails.amount)} {getTokenSymbol(escrowDetails.token)}
+          {formatEther(escrowDetails.amount)}{" "}
+          {getTokenSymbol(escrowDetails.token)}
         </span>
       </div>
       <div className="flex justify-between text-sm">
         <span className="text-gray-300">Status:</span>
-        <span className={`${
-          status === "Active" ? "text-green-400" :
-          status === "Claimed" ? "text-blue-400" :
-          "text-red-400"
-        }`}>
+        <span
+          className={`${
+            status === "Active"
+              ? "text-green-400"
+              : status === "Claimed"
+              ? "text-blue-400"
+              : "text-red-400"
+          }`}
+        >
           {status}
         </span>
       </div>
       <div className="flex justify-between text-sm">
         <span className="text-gray-300">Expires:</span>
         <span className="text-white">
-          {new Date(Number(escrowDetails.expirationTime) * 1000).toLocaleDateString()}
+          {new Date(
+            Number(escrowDetails.expirationTime) * 1000
+          ).toLocaleDateString()}
         </span>
       </div>
       <div className="flex justify-between text-sm">
@@ -84,10 +113,10 @@ function EscrowPreview({ escrowId }: { escrowId: number }) {
 
 // Expiration time options
 const EXPIRATION_OPTIONS = [
-  { label: '1 Hour', value: 3600 },
-  { label: '24 Hours', value: 86400 },
-  { label: '7 Days', value: 604800 },
-  { label: '30 Days', value: 2592000 },
+  { label: "1 Hour", value: 3600 },
+  { label: "24 Hours", value: 86400 },
+  { label: "7 Days", value: 604800 },
+  { label: "30 Days", value: 2592000 },
 ];
 
 // EscrowCard component for displaying individual escrows
@@ -116,18 +145,22 @@ function EscrowCard({
   userAddress,
   isDemoMode = false,
 }: EscrowCardProps) {
-  const [secret, setSecret] = useState('');
+  const [secret, setSecret] = useState("");
   const [showDetails, setShowDetails] = useState(false);
   const [showClaimForm, setShowClaimForm] = useState(false);
 
   const getTokenSymbol = (tokenAddress: string) => {
-    const token = TOKEN_OPTIONS.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-    return token ? token.symbol : 'Unknown';
+    const token = TOKEN_OPTIONS.find(
+      (t) => t.address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    return token ? token.symbol : "Unknown";
   };
 
   const getTokenColor = (tokenAddress: string) => {
-    const token = TOKEN_OPTIONS.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-    return token ? token.color : 'bg-gray-500';
+    const token = TOKEN_OPTIONS.find(
+      (t) => t.address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    return token ? token.color : "bg-gray-500";
   };
 
   const getEscrowStatus = () => {
@@ -144,7 +177,7 @@ function EscrowCard({
   const handleClaim = () => {
     if (secret.trim()) {
       onClaim({ escrowId, secret: secret.trim() });
-      setSecret('');
+      setSecret("");
       setShowClaimForm(false);
     }
   };
@@ -158,11 +191,23 @@ function EscrowCard({
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
+    <div
+      className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+      style={{
+        boxShadow:
+          "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+      }}
+    >
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 ${getTokenColor(escrow.token)} rounded-full flex items-center justify-center`}>
-            <span className="text-white font-bold text-sm">{getTokenSymbol(escrow.token)}</span>
+          <div
+            className={`w-10 h-10 ${getTokenColor(
+              escrow.token
+            )} rounded-full flex items-center justify-center`}
+          >
+            <span className="text-white font-bold text-sm">
+              {getTokenSymbol(escrow.token)}
+            </span>
           </div>
           <div>
             <h3 className="text-lg font-semibold text-white">
@@ -197,7 +242,9 @@ function EscrowCard({
           <div>
             <div className="text-gray-300 text-xs">Expires</div>
             <div className="text-white text-xs">
-              {new Date(Number(escrow.expirationTime) * 1000).toLocaleDateString()}
+              {new Date(
+                Number(escrow.expirationTime) * 1000
+              ).toLocaleDateString()}
             </div>
           </div>
         </div>
@@ -208,12 +255,13 @@ function EscrowCard({
               <button
                 onClick={() => setShowClaimForm(true)}
                 disabled={isDemoMode}
-             
               >
-                <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
-                {isDemoMode ? "Demo Mode" : "Claim Escrow"}
+                <GlowButton
+                  variant="red"
+                  className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                >
+                  {isDemoMode ? "Demo Mode" : "Claim Escrow"}
                 </GlowButton>
-
               </button>
             ) : (
               <div className="space-y-2">
@@ -229,10 +277,16 @@ function EscrowCard({
                   <button
                     onClick={handleClaim}
                     disabled={isClaiming || !secret.trim() || isDemoMode}
-                    
                   >
-                    <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
-                    {isDemoMode ? "Demo Mode" : isClaiming ? "Claiming..." : "Claim"}
+                    <GlowButton
+                      variant="red"
+                      className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                    >
+                      {isDemoMode
+                        ? "Demo Mode"
+                        : isClaiming
+                        ? "Claiming..."
+                        : "Claim"}
                     </GlowButton>
                   </button>
                   <button
@@ -252,20 +306,32 @@ function EscrowCard({
             <button
               onClick={handleCancel}
               disabled={isCancelling || isDemoMode}
-              
             >
-              <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
-              {isDemoMode ? "Demo Mode" : isCancelling ? "Cancelling..." : "Cancel Escrow"}
+              <GlowButton
+                variant="red"
+                className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+              >
+                {isDemoMode
+                  ? "Demo Mode"
+                  : isCancelling
+                  ? "Cancelling..."
+                  : "Cancel Escrow"}
               </GlowButton>
             </button>
             {isExpired && (
               <button
                 onClick={handleExpire}
                 disabled={isExpiring || isDemoMode}
-                
               >
-                <GlowButton variant="red"    className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
-                {isDemoMode ? "Demo Mode" : isExpiring ? "Expiring..." : "Expire Escrow"}
+                <GlowButton
+                  variant="red"
+                  className="w-full disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                >
+                  {isDemoMode
+                    ? "Demo Mode"
+                    : isExpiring
+                    ? "Expiring..."
+                    : "Expire Escrow"}
                 </GlowButton>
               </button>
             )}
@@ -283,20 +349,28 @@ function EscrowCard({
           <div className="mt-4 p-4 bg-white/5 rounded-xl space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-300">Token Address:</span>
-              <span className="text-white font-mono text-xs">{escrow.token}</span>
+              <span className="text-white font-mono text-xs">
+                {escrow.token}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Sender:</span>
-              <span className="text-white font-mono text-xs">{escrow.sender}</span>
+              <span className="text-white font-mono text-xs">
+                {escrow.sender}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Secret Hash:</span>
-              <span className="text-white font-mono text-xs">{escrow.secretHash.slice(0, 10)}...</span>
+              <span className="text-white font-mono text-xs">
+                {escrow.secretHash.slice(0, 10)}...
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Expiration:</span>
               <span className="text-white text-xs">
-                {new Date(Number(escrow.expirationTime) * 1000).toLocaleString()}
+                {new Date(
+                  Number(escrow.expirationTime) * 1000
+                ).toLocaleString()}
               </span>
             </div>
           </div>
@@ -312,16 +386,16 @@ export default function MagicLinkEscrow() {
   const [selectedTab, setSelectedTab] = useState("create");
   const [formData, setFormData] = useState({
     token: TOKEN_OPTIONS[0].address,
-    amount: '',
+    amount: "",
     expiration: EXPIRATION_OPTIONS[1].value,
-    secret: '',
-    recipientEmail: '',
+    secret: "",
+    recipientEmail: "",
   });
   const [createdEscrowId, setCreatedEscrowId] = useState<number | null>(null);
-  const [createdEscrowSecret, setCreatedEscrowSecret] = useState<string>('');
+  const [createdEscrowSecret, setCreatedEscrowSecret] = useState<string>("");
   const [claimFormData, setClaimFormData] = useState({
-    escrowId: '',
-    secret: '',
+    escrowId: "",
+    secret: "",
   });
 
   // Hooks
@@ -363,37 +437,37 @@ export default function MagicLinkEscrow() {
     isSuccess: isExpireSuccess,
   } = useExpireEscrow();
 
-  const { 
-    generateSecret, 
-    validateSecret, 
-    validateAmount, 
+  const {
+    generateSecret,
+    validateSecret,
+    validateAmount,
     validateExpirationTime,
     generateMagicLink,
-    sendEmail 
+    sendEmail,
   } = useEscrowValidation();
 
   // Generate secret on component mount (only once)
   useEffect(() => {
     if (!formData.secret) {
-      setFormData(prev => ({ ...prev, secret: generateSecret() }));
+      setFormData((prev) => ({ ...prev, secret: generateSecret() }));
     }
   }, []); // Empty dependency array - only run once on mount
 
   // Check for URL parameters to auto-fill claim form
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      const claimEscrowId = urlParams.get('claim');
-      const claimSecret = urlParams.get('secret');
-      
+      const claimEscrowId = urlParams.get("claim");
+      const claimSecret = urlParams.get("secret");
+
       if (claimEscrowId && claimSecret) {
         const decodedSecret = decodeURIComponent(claimSecret);
-        
+
         setClaimFormData({
           escrowId: claimEscrowId,
           secret: decodedSecret,
         });
-        setSelectedTab('claim');
+        setSelectedTab("claim");
       }
     }
   }, []);
@@ -403,18 +477,18 @@ export default function MagicLinkEscrow() {
     if (isCreateSuccess) {
       // The new escrow ID is escrowCount + 1 (since contract increments before storing)
       const newEscrowId = escrowCount + 1;
-      
+
       setCreatedEscrowId(newEscrowId);
       setCreatedEscrowSecret(formData.secret); // Store the secret used for creation
-      
+
       // Don't reset form immediately if there's an email to send
       if (!formData.recipientEmail) {
         setFormData({
           token: TOKEN_OPTIONS[0].address,
-          amount: '',
+          amount: "",
           expiration: EXPIRATION_OPTIONS[1].value,
-          secret: '', // Clear secret, let the mount effect generate a new one
-          recipientEmail: '',
+          secret: "", // Clear secret, let the mount effect generate a new one
+          recipientEmail: "",
         });
       }
       refetch();
@@ -430,28 +504,37 @@ export default function MagicLinkEscrow() {
 
   const handleCreateEscrow = async () => {
     if (!validateAmount(formData.amount) || !validateSecret(formData.secret)) {
-      console.error('Validation failed:', { 
-        amount: formData.amount, 
+      console.error("Validation failed:", {
+        amount: formData.amount,
         secret: formData.secret,
         amountValid: validateAmount(formData.amount),
-        secretValid: validateSecret(formData.secret)
+        secretValid: validateSecret(formData.secret),
       });
       return;
     }
 
-    const expirationTime = formData.expiration === 0 ? 0 : Math.floor(Date.now() / 1000) + formData.expiration;
-    
-    if (expirationTime > 0 && !validateExpirationTime(expirationTime, maxExpiration)) {
-      console.error('Expiration validation failed:', { expirationTime, maxExpiration });
+    const expirationTime =
+      formData.expiration === 0
+        ? 0
+        : Math.floor(Date.now() / 1000) + formData.expiration;
+
+    if (
+      expirationTime > 0 &&
+      !validateExpirationTime(expirationTime, maxExpiration)
+    ) {
+      console.error("Expiration validation failed:", {
+        expirationTime,
+        maxExpiration,
+      });
       return;
     }
 
-    console.log('Creating escrow with params:', {
+    console.log("Creating escrow with params:", {
       token: formData.token,
       amount: formData.amount,
       expirationTime,
       secret: formData.secret,
-      isETH: formData.token === '0x0000000000000000000000000000000000000000',
+      isETH: formData.token === "0x0000000000000000000000000000000000000000",
     });
 
     const params: CreateEscrowParams = {
@@ -479,10 +562,11 @@ export default function MagicLinkEscrow() {
   const handleSendEmail = () => {
     if (!createdEscrowId || !address || !formData.recipientEmail) return;
 
-    const expirationTime = formData.expiration === 0 
-      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days default
-      : new Date(Date.now() + formData.expiration * 1000);
-    
+    const expirationTime =
+      formData.expiration === 0
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days default
+        : new Date(Date.now() + formData.expiration * 1000);
+
     const magicLink = generateMagicLink(createdEscrowId, createdEscrowSecret);
     const tokenSymbol = getTokenSymbol(formData.token);
 
@@ -497,13 +581,15 @@ export default function MagicLinkEscrow() {
 
     // Clear the email field after a short delay to ensure email is sent first
     setTimeout(() => {
-      setFormData(prev => ({ ...prev, recipientEmail: '' }));
+      setFormData((prev) => ({ ...prev, recipientEmail: "" }));
     }, 100);
   };
 
   const getTokenSymbol = (tokenAddress: string) => {
-    const token = TOKEN_OPTIONS.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-    return token ? token.symbol : 'Unknown';
+    const token = TOKEN_OPTIONS.find(
+      (t) => t.address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    return token ? token.symbol : "Unknown";
   };
 
   const isDemoMode = !address;
@@ -541,7 +627,8 @@ export default function MagicLinkEscrow() {
             Magic Link Escrow
           </h1>
           <p className="text-gray-300 text-lg max-w-3xl mx-auto">
-            Create secure, time-locked escrows with secret-based claiming. Send crypto to anyone with just a link.
+            Create secure, time-locked escrows with secret-based claiming. Send
+            crypto to anyone with just a link.
           </p>
           {isDemoMode && (
             <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
@@ -554,7 +641,13 @@ export default function MagicLinkEscrow() {
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             {["create", "claim", "my-escrows", "all-escrows"].map((tab) => (
               <button
                 key={tab}
@@ -565,7 +658,7 @@ export default function MagicLinkEscrow() {
                     : "text-gray-300 hover:text-white hover:bg-white/10"
                 }`}
               >
-                {tab.replace('-', ' ')}
+                {tab.replace("-", " ")}
               </button>
             ))}
           </div>
@@ -574,7 +667,13 @@ export default function MagicLinkEscrow() {
         {/* Create Tab */}
         {selectedTab === "create" && (
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Create Magic Link Escrow
               </h2>
@@ -589,7 +688,12 @@ export default function MagicLinkEscrow() {
                     {TOKEN_OPTIONS.map((token) => (
                       <button
                         key={token.symbol}
-                        onClick={() => setFormData(prev => ({ ...prev, token: token.address }))}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            token: token.address,
+                          }))
+                        }
                         className={`p-4 rounded-xl border transition-all duration-300 ${
                           formData.token === token.address
                             ? "bg-white/20 border-white/30 text-white"
@@ -597,7 +701,9 @@ export default function MagicLinkEscrow() {
                         }`}
                       >
                         <div className="text-center">
-                          <div className={`w-8 h-8 ${token.color} rounded-full mx-auto mb-2`}></div>
+                          <div
+                            className={`w-8 h-8 ${token.color} rounded-full mx-auto mb-2`}
+                          ></div>
                           <span className="font-medium">{token.symbol}</span>
                         </div>
                       </button>
@@ -615,7 +721,12 @@ export default function MagicLinkEscrow() {
                       type="number"
                       step="0.001"
                       value={formData.amount}
-                      onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          amount: e.target.value,
+                        }))
+                      }
                       placeholder="0.0"
                       disabled={isDemoMode}
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30 disabled:opacity-50"
@@ -633,12 +744,21 @@ export default function MagicLinkEscrow() {
                   </label>
                   <select
                     value={formData.expiration}
-                    onChange={(e) => setFormData(prev => ({ ...prev, expiration: parseInt(e.target.value) }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        expiration: parseInt(e.target.value),
+                      }))
+                    }
                     disabled={isDemoMode}
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30 disabled:opacity-50"
                   >
                     {EXPIRATION_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value} className="bg-gray-800">
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        className="bg-gray-800"
+                      >
                         {option.label}
                       </option>
                     ))}
@@ -654,13 +774,23 @@ export default function MagicLinkEscrow() {
                     <input
                       type="text"
                       value={formData.secret}
-                      onChange={(e) => setFormData(prev => ({ ...prev, secret: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          secret: e.target.value,
+                        }))
+                      }
                       placeholder="Enter secret or generate one"
                       disabled={isDemoMode}
                       className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30 disabled:opacity-50"
                     />
                     <button
-                      onClick={() => setFormData(prev => ({ ...prev, secret: generateSecret() }))}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          secret: generateSecret(),
+                        }))
+                      }
                       disabled={isDemoMode}
                       className="px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 disabled:opacity-50"
                     >
@@ -680,29 +810,43 @@ export default function MagicLinkEscrow() {
                   <input
                     type="email"
                     value={formData.recipientEmail}
-                    onChange={(e) => setFormData(prev => ({ ...prev, recipientEmail: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        recipientEmail: e.target.value,
+                      }))
+                    }
                     placeholder="recipient@example.com"
                     disabled={isDemoMode}
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30 disabled:opacity-50"
                   />
                   <p className="text-gray-400 text-xs mt-1">
-                    If provided, we&apos;ll open your email client with a pre-filled message containing the magic link
+                    If provided, we&apos;ll open your email client with a
+                    pre-filled message containing the magic link
                   </p>
                 </div>
 
                 {/* Create Button */}
                 <button
                   onClick={handleCreateEscrow}
-                  disabled={isCreating || isConfirmingCreate || !formData.amount || !formData.secret || isDemoMode}
-                 className='flex w-full justify-center'
-                >
-                  <GlowButton variant="red"    className="w-full flex justify-center items-center disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">
-                  {isDemoMode 
-                    ? "Demo Mode" 
-                    : isCreating || isConfirmingCreate 
-                    ? "Creating Escrow..." 
-                    : "Create Magic Link Escrow"
+                  disabled={
+                    isCreating ||
+                    isConfirmingCreate ||
+                    !formData.amount ||
+                    !formData.secret ||
+                    isDemoMode
                   }
+                  className="flex w-full justify-center"
+                >
+                  <GlowButton
+                    variant="red"
+                    className="w-full flex justify-center items-center disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                  >
+                    {isDemoMode
+                      ? "Demo Mode"
+                      : isCreating || isConfirmingCreate
+                      ? "Creating Escrow..."
+                      : "Create Magic Link Escrow"}
                   </GlowButton>
                 </button>
 
@@ -720,8 +864,18 @@ export default function MagicLinkEscrow() {
                   <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-xl">
                     <div className="flex items-start gap-3">
                       <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-3 h-3 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
                       <div className="flex-1">
@@ -729,9 +883,11 @@ export default function MagicLinkEscrow() {
                           🎉 Escrow created successfully!
                         </p>
                         <p className="text-green-200 text-xs mb-3">
-                          Your magic link escrow has been created. You can now share the secret with the recipient or send it via email.
+                          Your magic link escrow has been created. You can now
+                          share the secret with the recipient or send it via
+                          email.
                         </p>
-                        
+
                         {formData.recipientEmail && createdEscrowId && (
                           <div className="space-y-2">
                             <p className="text-green-200 text-xs">
@@ -742,22 +898,30 @@ export default function MagicLinkEscrow() {
                               disabled={isDemoMode}
                               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 text-white py-2 px-4 rounded-lg transition-all duration-300 text-sm"
                             >
-                              {isDemoMode ? "Demo Mode" : "📧 Send Magic Link Email"}
+                              {isDemoMode
+                                ? "Demo Mode"
+                                : "📧 Send Magic Link Email"}
                             </button>
                           </div>
                         )}
-                        
+
                         {createdEscrowId && createdEscrowSecret && (
                           <div className="mt-3 p-2 bg-white/10 rounded-lg">
-                            <p className="text-green-200 text-xs mb-1">Magic Link:</p>
+                            <p className="text-green-200 text-xs mb-1">
+                              Magic Link:
+                            </p>
                             <code className="text-green-100 text-xs break-all">
-                              {generateMagicLink(createdEscrowId, createdEscrowSecret)}
+                              {generateMagicLink(
+                                createdEscrowId,
+                                createdEscrowSecret
+                              )}
                             </code>
                           </div>
                         )}
-                        
+
                         <p className="text-green-200 text-xs mt-2">
-                          Check &quot;My Escrows&quot; tab to view and manage your escrow.
+                          Check &quot;My Escrows&quot; tab to view and manage
+                          your escrow.
                         </p>
                       </div>
                     </div>
@@ -771,7 +935,13 @@ export default function MagicLinkEscrow() {
         {/* Claim Tab */}
         {selectedTab === "claim" && (
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Claim Magic Link Escrow
               </h2>
@@ -809,7 +979,12 @@ export default function MagicLinkEscrow() {
                   <input
                     type="number"
                     value={claimFormData.escrowId}
-                    onChange={(e) => setClaimFormData(prev => ({ ...prev, escrowId: e.target.value }))}
+                    onChange={(e) =>
+                      setClaimFormData((prev) => ({
+                        ...prev,
+                        escrowId: e.target.value,
+                      }))
+                    }
                     placeholder="Enter escrow ID"
                     disabled={isDemoMode}
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30 disabled:opacity-50"
@@ -824,7 +999,12 @@ export default function MagicLinkEscrow() {
                   <input
                     type="text"
                     value={claimFormData.secret}
-                    onChange={(e) => setClaimFormData(prev => ({ ...prev, secret: e.target.value }))}
+                    onChange={(e) =>
+                      setClaimFormData((prev) => ({
+                        ...prev,
+                        secret: e.target.value,
+                      }))
+                    }
                     placeholder="Enter the secret provided by the sender"
                     disabled={isDemoMode}
                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30 disabled:opacity-50"
@@ -832,44 +1012,51 @@ export default function MagicLinkEscrow() {
                 </div>
 
                 {/* Escrow Preview */}
-                {claimFormData.escrowId && parseInt(claimFormData.escrowId) > 0 && (
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <h4 className="text-white font-medium mb-2">Escrow Preview</h4>
-                    <EscrowPreview escrowId={parseInt(claimFormData.escrowId)} />
-                  </div>
-                )}
+                {claimFormData.escrowId &&
+                  parseInt(claimFormData.escrowId) > 0 && (
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <h4 className="text-white font-medium mb-2">
+                        Escrow Preview
+                      </h4>
+                      <EscrowPreview
+                        escrowId={parseInt(claimFormData.escrowId)}
+                      />
+                    </div>
+                  )}
 
                 {/* Claim Button */}
                 <button
-                  onClick={() => handleClaimEscrow({ 
-                    escrowId: parseInt(claimFormData.escrowId), 
-                    secret: claimFormData.secret 
-                  })}
+                  onClick={() =>
+                    handleClaimEscrow({
+                      escrowId: parseInt(claimFormData.escrowId),
+                      secret: claimFormData.secret,
+                    })
+                  }
                   disabled={
-                    isClaiming || 
-                    isConfirmingClaim || 
-                    !claimFormData.escrowId || 
-                    !claimFormData.secret || 
+                    isClaiming ||
+                    isConfirmingClaim ||
+                    !claimFormData.escrowId ||
+                    !claimFormData.secret ||
                     isDemoMode
                   }
                   className="w-full flex justify-center"
                 >
-                   <GlowButton variant="red"  className="w-full flex justify-center items-center disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300">{isDemoMode 
-                    ? "Demo Mode" 
-                    : isClaiming || isConfirmingClaim 
-                    ? "Claiming Escrow..." 
-                    : "🎁 Claim Tokens"
-                  }</GlowButton>
-                  
-                    
+                  <GlowButton
+                    variant="red"
+                    className="w-full flex justify-center items-center disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+                  >
+                    {isDemoMode
+                      ? "Demo Mode"
+                      : isClaiming || isConfirmingClaim
+                      ? "Claiming Escrow..."
+                      : "🎁 Claim Tokens"}
+                  </GlowButton>
                 </button>
 
                 {/* Error Display */}
                 {claimError && (
                   <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
-                    <p className="text-red-300 text-sm">
-                      {claimError.message}
-                    </p>
+                    <p className="text-red-300 text-sm">{claimError.message}</p>
                   </div>
                 )}
 
@@ -883,7 +1070,10 @@ export default function MagicLinkEscrow() {
                 )}
 
                 <div className="text-center text-gray-400 text-sm">
-                  <p>Don&apos;t have the secret? Contact the person who sent you the magic link.</p>
+                  <p>
+                    Don&apos;t have the secret? Contact the person who sent you
+                    the magic link.
+                  </p>
                 </div>
               </div>
             </div>
@@ -893,7 +1083,13 @@ export default function MagicLinkEscrow() {
         {/* My Escrows Tab */}
         {selectedTab === "my-escrows" && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h2 className="text-2xl font-semibold text-white mb-6">
                 My Escrows ({userEscrows.length})
               </h2>
@@ -904,7 +1100,9 @@ export default function MagicLinkEscrow() {
                 </div>
               ) : userEscrows.length === 0 ? (
                 <div className="text-center py-8">
-                  <div className="text-gray-300">You haven&apos;t created any escrows yet.</div>
+                  <div className="text-gray-300">
+                    You haven&apos;t created any escrows yet.
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -915,7 +1113,12 @@ export default function MagicLinkEscrow() {
                       const escrow = escrows[escrowId - 1];
                       return escrow ? { escrow, escrowId } : null;
                     })
-                    .filter((item): item is { escrow: EscrowDetails; escrowId: number } => item !== null)
+                    .filter(
+                      (
+                        item
+                      ): item is { escrow: EscrowDetails; escrowId: number } =>
+                        item !== null
+                    )
                     .map(({ escrow, escrowId }) => (
                       <EscrowCard
                         key={escrowId}
@@ -940,24 +1143,38 @@ export default function MagicLinkEscrow() {
         {/* All Escrows Tab */}
         {selectedTab === "all-escrows" && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
+              style={{
+                boxShadow:
+                  "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+              }}
+            >
               <h2 className="text-2xl font-semibold text-white mb-6">
-                All Escrows ({escrows.filter(escrow => {
-                  const isExpired = Date.now() / 1000 > Number(escrow.expirationTime);
-                  return escrow.claimed || (!escrow.cancelled && !isExpired);
-                }).length})
+                All Escrows (
+                {
+                  escrows.filter((escrow) => {
+                    const isExpired =
+                      Date.now() / 1000 > Number(escrow.expirationTime);
+                    return escrow.claimed || (!escrow.cancelled && !isExpired);
+                  }).length
+                }
+                )
               </h2>
 
               {escrowsLoading ? (
                 <div className="text-center py-8">
                   <div className="text-gray-300">Loading escrows...</div>
                 </div>
-              ) : escrows.filter(escrow => {
-                const isExpired = Date.now() / 1000 > Number(escrow.expirationTime);
-                return escrow.claimed || (!escrow.cancelled && !isExpired);
-              }).length === 0 ? (
+              ) : escrows.filter((escrow) => {
+                  const isExpired =
+                    Date.now() / 1000 > Number(escrow.expirationTime);
+                  return escrow.claimed || (!escrow.cancelled && !isExpired);
+                }).length === 0 ? (
                 <div className="text-center py-8">
-                  <div className="text-gray-300">No active or claimed escrows found.</div>
+                  <div className="text-gray-300">
+                    No active or claimed escrows found.
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -965,8 +1182,11 @@ export default function MagicLinkEscrow() {
                     .map((escrow, index) => ({ escrow, escrowId: index + 1 }))
                     .filter(({ escrow }) => {
                       // Show only claimed or active escrows (not cancelled or expired)
-                      const isExpired = Date.now() / 1000 > Number(escrow.expirationTime);
-                      return escrow.claimed || (!escrow.cancelled && !isExpired);
+                      const isExpired =
+                        Date.now() / 1000 > Number(escrow.expirationTime);
+                      return (
+                        escrow.claimed || (!escrow.cancelled && !isExpired)
+                      );
                     })
                     .map(({ escrow, escrowId }) => (
                       <EscrowCard
@@ -989,10 +1209,15 @@ export default function MagicLinkEscrow() {
           </div>
         )}
 
-
         {/* Benefits Section */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-6 h-6 text-blue-400"
@@ -1016,7 +1241,13 @@ export default function MagicLinkEscrow() {
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-6 h-6 text-green-400"
@@ -1038,7 +1269,13 @@ export default function MagicLinkEscrow() {
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+          <div
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
+            style={{
+              boxShadow:
+                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
+            }}
+          >
             <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-6 h-6 text-purple-400"
@@ -1054,7 +1291,9 @@ export default function MagicLinkEscrow() {
                 />
               </svg>
             </div>
-            <h3 className="text-white font-semibold mb-2">Multi-Token Support</h3>
+            <h3 className="text-white font-semibold mb-2">
+              Multi-Token Support
+            </h3>
             <p className="text-gray-300 text-sm">
               Support for ETH and ERC20 tokens with easy claiming
             </p>

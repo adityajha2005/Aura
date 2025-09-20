@@ -6,18 +6,18 @@ enum VaraintColor {
   blue = "blue",
   green = "green",
   red = "red",
-  dark = "dark",
 }
 
 const GlowButton = ({
   children,
   variant = VaraintColor.orange,
   className,
+  ...props
 }: {
   children: React.ReactNode;
   variant?: string;
   className?: string;
-}) => {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
       className={cn(
@@ -28,15 +28,12 @@ const GlowButton = ({
           ? "[box-shadow:0_0_100px_-10px_#0165FF] before:[box-shadow:0_0_7px_-1px_#d5e5ff_inset] bg-[#126fff]  border-[#9ec4ff]/90"
           : variant === VaraintColor.red
           ? "[box-shadow:0_0_100px_-10px_#DC2626] before:[box-shadow:0_0_7px_-1px_#fecaca_inset]  bg-[#dc2626c0]  border-[#fca5a5]/50"
-          : variant === VaraintColor.dark
-          ? "[box-shadow:0_0_80px_-10px_#991b1b] before:[box-shadow:0_0_6px_-1px_#fee2e2_inset] bg-gradient-to-r from-gray-900 to-red-900/80 border-red-800/40"
           : "[box-shadow:0_0_100px_-10px_#21924c] before:[box-shadow:0_0_7px_-1px_#91e6b2_inset] bg-[#176635]  border-[#c0f1d3]/70",
         className
       )}
+      {...props}
     >
-     
-        <p>{children}</p>
-    
+      <p>{children}</p>
     </button>
   );
 };
