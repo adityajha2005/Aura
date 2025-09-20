@@ -39,7 +39,7 @@ function Header() {
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex items-center space-x-2 bg-tranparent backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
+      <nav className="flex ml-30 items-center space-x-2 bg-tranparent backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
         {navItems.map((item) => (
           <Link
             key={item.name}
