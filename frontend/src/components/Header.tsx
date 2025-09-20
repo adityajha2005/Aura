@@ -26,11 +26,11 @@ function Header() {
     try {
       await switchChain({ chainId: avalancheFuji.id });
     } catch (error) {
-      console.error('Failed to switch to Avalanche Fuji:', error);
+      console.error("Failed to switch to Avalanche Fuji:", error);
     }
   };
   return (
-    <header className="fixed w-full h-16 z-20 bg-transparent backdrop-blur-2xl flex items-center justify-between px-8  ">
+    <header className="fixed w-full h-16 z-50 backdrop-blur-3xl border-b border-white/10 flex items-center justify-between px-8 rounded-full shadow-lg">
       {/* Logo */}
       <div className="flex items-center">
         <div className="text-white text-2xl font-bold">
@@ -77,22 +77,22 @@ function Header() {
           }) => {
             // Note: If your app doesn't use authentication, you
             // can remove all 'authenticationStatus' checks
-            const ready = mounted && authenticationStatus !== 'loading';
+            const ready = mounted && authenticationStatus !== "loading";
             const connected =
               ready &&
               account &&
               chain &&
               (!authenticationStatus ||
-                authenticationStatus === 'authenticated');
+                authenticationStatus === "authenticated");
 
             return (
               <div
                 {...(!ready && {
-                  'aria-hidden': true,
-                  'style': {
+                  "aria-hidden": true,
+                  style: {
                     opacity: 0,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
+                    pointerEvents: "none",
+                    userSelect: "none",
                   },
                 })}
               >
@@ -147,13 +147,13 @@ function Header() {
                               width: 16,
                               height: 16,
                               borderRadius: 999,
-                              overflow: 'hidden',
+                              overflow: "hidden",
                               marginRight: 4,
                             }}
                           >
                             {chain.iconUrl && (
                               <img
-                                alt={chain.name ?? 'Chain icon'}
+                                alt={chain.name ?? "Chain icon"}
                                 src={chain.iconUrl}
                                 style={{ width: 16, height: 16 }}
                               />
@@ -175,7 +175,7 @@ function Header() {
                         {account.displayName}
                         {account.displayBalance
                           ? ` (${account.displayBalance})`
-                          : ''}
+                          : ""}
                       </button>
                     </div>
                   );
