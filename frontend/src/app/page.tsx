@@ -1,103 +1,274 @@
-import Image from "next/image";
+import PhoneComponent from "@/components/phone-component";
+import GlowButton from "@/components/ui/glow-button";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Static 3D Glass Cards */}
+      <div className="absolute inset-0 z-0" style={{ perspective: "1000px" }}>
+        {/* Card 1 - Far left */}
+        <div
+          className="absolute left-8 w-48 h-64 bg-white/2 backdrop-blur-sm rounded-xl border border-white/5 shadow-2xl"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+            top: "65%",
+            transform:
+              "translateY(-50%) rotateY(45deg) rotateX(15deg) scale(0.8)",
+            transformOrigin: "center center",
+          }}
         />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {/* Card 2 - Left */}
+        <div
+          className="absolute left-54 w-52 h-68 bg-white/3 backdrop-blur-md rounded-lg border border-white/6 shadow-xl"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+            top: "60%",
+            transform:
+              "translateY(-50%) rotateY(30deg) rotateX(12deg) scale(0.85)",
+            transformOrigin: "center center",
+          }}
+        />
+
+        {/* Card 3 - Center left */}
+        <div
+          className="absolute left-103 w-56 h-72 bg-white/2 backdrop-blur-lg rounded-2xl border border-white/5 shadow-2xl"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
+            top: "55%",
+            transform:
+              "translateY(-50%) rotateY(15deg) rotateX(8deg) scale(0.9)",
+            transformOrigin: "center center",
+          }}
+        />
+
+        {/* Card 4 - Center */}
+        <div
+          className="absolute left-1/2 w-60 h-76 bg-white/4 backdrop-blur-sm rounded-lg border border-white/8 shadow-lg"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))",
+            top: "50%",
+            transform: "translate(-50%, -50%) rotateX(5deg) scale(1)",
+            transformOrigin: "center center",
+          }}
+        />
+
+        {/* Card 5 - Center right */}
+        <div
+          className="absolute right-103 w-48 h-64 bg-white/3 backdrop-blur-md rounded-lg border border-white/7 shadow-lg"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+            top: "55%",
+            transform:
+              "translateY(-50%) rotateY(-15deg) rotateX(8deg) scale(0.9)",
+            transformOrigin: "center center",
+          }}
+        />
+
+        {/* Card 6 - Right */}
+        <div
+          className="absolute right-52 w-52 h-68 bg-white/2 backdrop-blur-lg rounded-xl border border-white/6 shadow-xl"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+            top: "60%",
+            transform:
+              "translateY(-50%) rotateY(-30deg) rotateX(12deg) scale(0.85)",
+            transformOrigin: "center center",
+          }}
+        />
+
+        {/* Card 7 - Far right */}
+        <div
+          className="absolute right-8 w-44 h-60 bg-white/3 backdrop-blur-sm rounded-2xl border border-white/6 shadow-2xl"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+            top: "65%",
+            transform:
+              "translateY(-50%) rotateY(-45deg) rotateX(15deg) scale(0.8)",
+            transformOrigin: "center center",
+          }}
+        />
+      </div>
+
+      {/* Main content container */}
+      <div className="h-screen flex flex-col items-center justify-between text-center text-white z-20 relative mt-26 py-20">
+        {/* Hero Section */}
+        <div className="flex-1 flex  flex-col items-center justify-center">
+          <div
+            className="text-6xl font-medium mb-6"
+            style={{
+              fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Fast. Efficient.
+            <div
+              className="font-semibold text-7xl"
+              style={{
+                fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
+              }}
+            >
+              Revolutionary.
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mb-8">
+            <p className="text-gray-300 text-lg font-extralight">
+              Experience the future of blockchain with Aura - where speed meets
+              innovation.
+            </p>
+            <p className="text-gray-300 text-lg font-extralight">
+              Powered by Avalanche
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="text-lg flex justify-center items-center">
+            <button
+              className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-2 rounded-full text-white mr-4 hover:bg-white/20 transition-all duration-300"
+              style={{
+                boxShadow:
+                  "inset 6px 0 16px rgba(255, 255, 255, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              Lets Start Now
+            </button>
+
+            <GlowButton variant="red">Join Us</GlowButton>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Phone and Cards Section */}
+        <div className="relative z-20 flex-shrink-0">
+          <div className="flex justify-center items-center gap-6 px-4 scale-75">
+            {/* Ethereum Card */}
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-4 w-64 relative overflow-hidden transform rotate-6 -translate-y-28 translate-x-36 z-50"
+              style={{
+                boxShadow:
+                  "inset 4px 0 16px rgba(255, 255, 255, 0.1), 0 4px 6px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                      <div
+                        className="w-3 h-4 bg-white"
+                        style={{
+                          clipPath:
+                            "polygon(50% 0%, 0% 40%, 50% 100%, 100% 40%)",
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-lg">
+                      Ethereum
+                    </h3>
+                    <p className="text-white/70 text-sm">ETH</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-white font-bold text-xl">$1,467.38</div>
+                  <div className="text-green-300 text-sm">+7.45%</div>
+                </div>
+              </div>
+
+              {/* Mini Chart */}
+              <div className="mt-4 flex items-end space-x-1 h-8">
+                {[
+                  12, 8, 15, 10, 18, 14, 20, 16, 22, 18, 25, 20, 28, 24, 30,
+                ].map((height, index) => (
+                  <div
+                    key={index}
+                    className="bg-white/30 rounded-sm flex-1"
+                    style={{ height: `${height}px` }}
+                  ></div>
+                ))}
+              </div>
+            </div>
+            {/* Phone Component */}
+            <div className="flex justify-center relative">
+              {/* AURA text behind phone - horizontal layout */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-170 -translate-y-1/2 z-0">
+                <div
+                  className="flex gap-8 text-white text-[250px] font-bold select-none opacity-50"
+                  style={{
+                    fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
+                  }}
+                >
+                  <span className="text-red-700/90">A</span>
+                  <span>U</span>
+                  
+                </div>
+              </div>
+              <div className="absolute top-1/2 left-1/2 transform translate-x-80 -translate-y-1/2 z-0">
+                <div
+                  className="flex gap-8 text-white text-[250px] font-bold select-none opacity-50"
+                  style={{
+                    fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
+                  }}
+                >
+                 
+                  <span>R</span>
+                  <span>A</span>
+                </div>
+              </div>
+
+              <PhoneComponent />
+            </div>{" "}
+            {/* Avalanche Card */}
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-4 w-64 relative overflow-hidden transform -rotate-6  -translate-x-30"
+              style={{
+                boxShadow:
+                  "inset -4px 0 16px rgba(239, 68, 68, 0.2), 0 4px 6px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                    <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                      <div className="text-white font-bold text-sm">A</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-lg">
+                      Avalanche
+                    </h3>
+                    <p className="text-white/50 text-sm">AVAX</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-white font-bold text-xl">$24.65</div>
+                  <div className="text-red-300 text-sm">-2.15%</div>
+                </div>
+              </div>
+
+              {/* Mini Chart - Declining */}
+              <div className="mt-4 flex items-end space-x-1 h-8">
+                {[20, 18, 16, 14, 12, 10, 8, 6, 8, 10, 7, 5, 4, 6, 3].map(
+                  (height, index) => (
+                    <div
+                      key={index}
+                      className="bg-red-500/40 rounded-sm flex-1"
+                      style={{ height: `${height}px` }}
+                    ></div>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
