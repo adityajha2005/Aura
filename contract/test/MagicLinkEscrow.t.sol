@@ -13,8 +13,8 @@ contract MagicLinkEscrowTest is Test {
     address recipient = address(0x2);
     address thirdParty = address(0x3);
     
-    string secret = "mySecret123";
-    bytes32 secretHash = keccak256(abi.encodePacked("mySecret123"));
+    bytes32 secret = "mySecret123"; // Raw secret as bytes32
+    bytes32 secretHash = keccak256(abi.encodePacked(secret)); // Hash of the secret
     
     function setUp() public {
         escrow = new MagicLinkEscrow();

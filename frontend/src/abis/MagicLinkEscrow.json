@@ -58,8 +58,8 @@
       },
       {
         "name": "secret",
-        "type": "string",
-        "internalType": "string"
+        "type": "bytes32",
+        "internalType": "bytes32"
       }
     ],
     "outputs": [],

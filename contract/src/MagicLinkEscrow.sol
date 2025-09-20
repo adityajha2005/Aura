@@ -126,7 +126,7 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
      * @param escrowId The ID of the escrow to claim
      * @param secret The secret to prove ownership
      */
-    function claimEscrow(uint256 escrowId, string memory secret) external nonReentrant {
+    function claimEscrow(uint256 escrowId, bytes32 secret) external nonReentrant {
         Escrow storage escrow = escrows[escrowId];
         
         require(escrow.sender != address(0), "Escrow not found");
