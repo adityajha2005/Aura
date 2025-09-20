@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useSwitchChain } from "wagmi";
+import { avalancheFuji } from "wagmi/chains";
 
 function Header() {
   const pathname = usePathname();
+  const { switchChain } = useSwitchChain();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -16,6 +20,14 @@ function Header() {
 
   const isActive = (path: string) => {
     return pathname === path;
+  };
+
+  const handleSwitchToAvalancheFuji = async () => {
+    try {
+      await switchChain({ chainId: avalancheFuji.id });
+    } catch (error) {
+      console.error('Failed to switch to Avalanche Fuji:', error);
+    }
   };
   return (
     <header className="fixed w-full h-16 z-20 bg-transparent backdrop-blur-2xl flex items-center justify-between px-8  ">
@@ -53,15 +65,125 @@ function Header() {
 
       {/* Right Side Buttons glassmorphic button*/}
       <div className="flex items-center space-x-4">
-        <button
-          className=" backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 px-6 py-2 rounded-full text-white shadow-inner"
-          style={{
-            boxShadow:
-              "inset 0 0 16px rgba(239, 68, 68, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1)",
+        <ConnectButton.Custom>
+          {({
+            account,
+            chain,
+            openAccountModal,
+            openChainModal,
+            openConnectModal,
+            authenticationStatus,
+            mounted,
+          }) => {
+            // Note: If your app doesn't use authentication, you
+            // can remove all 'authenticationStatus' checks
+            const ready = mounted && authenticationStatus !== 'loading';
+            const connected =
+              ready &&
+              account &&
+              chain &&
+              (!authenticationStatus ||
+                authenticationStatus === 'authenticated');
+
+            return (
+              <div
+                {...(!ready && {
+                  'aria-hidden': true,
+                  'style': {
+                    opacity: 0,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                  },
+                })}
+              >
+                {(() => {
+                  if (!connected) {
+                    return (
+                      <button
+                        onClick={openConnectModal}
+                        type="button"
+                        className="backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 px-6 py-2 rounded-full text-white shadow-inner"
+                        style={{
+                          boxShadow:
+                            "inset 0 0 16px rgba(239, 68, 68, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1)",
+                        }}
+                      >
+                        Connect Wallet
+                      </button>
+                    );
+                  }
+
+                  if (chain.unsupported) {
+                    return (
+                      <button
+                        onClick={handleSwitchToAvalancheFuji}
+                        type="button"
+                        className="backdrop-blur-md border border-red-500/50 hover:bg-red-500/10 transition-all duration-300 px-6 py-2 rounded-full text-red-300 shadow-inner"
+                        style={{
+                          boxShadow:
+                            "inset 0 0 16px rgba(239, 68, 68, 0.5), 0 4px 6px rgba(0, 0, 0, 0.1)",
+                        }}
+                      >
+                        Switch to Avalanche Fuji
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={openChainModal}
+                        type="button"
+                        className="backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 px-3 py-2 rounded-full text-white shadow-inner flex items-center space-x-2"
+                        style={{
+                          boxShadow:
+                            "inset 0 0 16px rgba(239, 68, 68, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1)",
+                        }}
+                      >
+                        {chain.hasIcon && (
+                          <div
+                            style={{
+                              background: chain.iconBackground,
+                              width: 16,
+                              height: 16,
+                              borderRadius: 999,
+                              overflow: 'hidden',
+                              marginRight: 4,
+                            }}
+                          >
+                            {chain.iconUrl && (
+                              <img
+                                alt={chain.name ?? 'Chain icon'}
+                                src={chain.iconUrl}
+                                style={{ width: 16, height: 16 }}
+                              />
+                            )}
+                          </div>
+                        )}
+                        {chain.name}
+                      </button>
+
+                      <button
+                        onClick={openAccountModal}
+                        type="button"
+                        className="backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 px-6 py-2 rounded-full text-white shadow-inner"
+                        style={{
+                          boxShadow:
+                            "inset 0 0 16px rgba(239, 68, 68, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1)",
+                        }}
+                      >
+                        {account.displayName}
+                        {account.displayBalance
+                          ? ` (${account.displayBalance})`
+                          : ''}
+                      </button>
+                    </div>
+                  );
+                })()}
+              </div>
+            );
           }}
-        >
-          Connect Wallet
-        </button>
+        </ConnectButton.Custom>
       </div>
     </header>
   );
