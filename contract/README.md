@@ -1,66 +1,7 @@
-## Foundry
-
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
-
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+✅ Base Token (TestTokens): 0xcEBD597dF2819853bB337b23117FA9369Ab8C2a0
+✅ Governance Token (AGOV): 0x038EDCeC11e286068C1ebF8bd4A16336365080Df
+✅ LP Token (ALP): 0xb7ed5c8d30B53beA831e840bC2b82B3Fb954FC7D
+✅ Liquidity Pool: 0x90DDF033591582512A4EA2De46B1D2fac8901895
+✅ Governance: 0x324f8aaB44d2BFc93E062B7A9b1edcc93c268605
+✅ Launchpad: 0xE6B8d115432E0D412213c53C298661352f81A6dB 
+✅ Magic Link Escrow: 0x3375Bf8Bf1Fc2E7C197eD66DB53E90568473BA60

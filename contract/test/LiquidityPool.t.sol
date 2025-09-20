@@ -4,7 +4,7 @@ pragma solidity ^0.8.29;
 import "forge-std/Test.sol";
 import {LiquidityPool} from "../src/LiquidityPool.sol";
 import {TestTokens} from "../src/TestTokens.sol";
-
+import {LPToken} from "../src/LPToken.sol";
 contract LiquidityPoolTest is Test {
     LiquidityPool pool;
     TestTokens tokenA;
@@ -18,7 +18,9 @@ contract LiquidityPoolTest is Test {
         tokenB.mint(address(this), 1_000_000 ether);
         tokenA.mint(user, 1_000_000 ether);
         tokenB.mint(user, 1_000_000 ether);
-        pool = new LiquidityPool(tokenA, tokenB);
+        LPToken lpToken = new LPToken(address(this));
+        pool = new LiquidityPool(tokenA, tokenB, lpToken);
+        lpToken.transferOwnership(address(pool));
         tokenA.approve(address(pool), type(uint256).max);
         tokenB.approve(address(pool), type(uint256).max);
         vm.prank(user);

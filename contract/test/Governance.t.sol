@@ -6,7 +6,7 @@ import {LiquidityPool} from "../src/LiquidityPool.sol";
 import {Governance} from "../src/Governance.sol";
 import {AuraGovernanceToken} from "../src/AuraGovernanceToken.sol";
 import {TestTokens} from "../src/TestTokens.sol";
-
+import {LPToken} from "../src/LPToken.sol";
 contract GovernanceTest is Test {
     LiquidityPool pool;
     Governance gov;
@@ -20,7 +20,9 @@ contract GovernanceTest is Test {
         tokenA = new TestTokens("TokenA","A");
         tokenB = new TestTokens("TokenB","B");
         governanceToken = new AuraGovernanceToken();
-        pool = new LiquidityPool(tokenA, tokenB);
+        LPToken lpToken = new LPToken(address(this));
+        pool = new LiquidityPool(tokenA, tokenB, lpToken);
+        lpToken.transferOwnership(address(pool));
         gov = new Governance(pool, governanceToken);
         pool.setGovernance(address(gov));
         governanceToken.mint(voter1, 10000 * 10**18);

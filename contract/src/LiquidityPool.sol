@@ -35,10 +35,10 @@ contract LiquidityPool is Ownable, ReentrancyGuard {
         governance = _governance;
     }
 
-    constructor(ERC20 _tokenA, ERC20 _tokenB) Ownable(msg.sender) {
+    constructor(ERC20 _tokenA, ERC20 _tokenB, LPToken _lpToken) Ownable(msg.sender) {
         tokenA = _tokenA;
         tokenB = _tokenB;
-        lpToken = new LPToken();
+        lpToken = _lpToken;
     }
 
     function addLiquidity(uint amountA, uint amountB) external nonReentrant {

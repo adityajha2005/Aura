@@ -6,7 +6,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract LPToken is ERC20, Ownable {
     
-    constructor() ERC20("Aura LP Token", "ALP") Ownable(msg.sender) {}
+    constructor(address owner) ERC20("Aura LP Token", "ALP") Ownable(owner) {}
     
     function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);

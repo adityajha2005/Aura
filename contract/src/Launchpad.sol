@@ -6,7 +6,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {LiquidityPool} from "./LiquidityPool.sol";
-
+import {LPToken} from "./LPToken.sol";
 contract Launchpad is Ownable, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
@@ -23,8 +23,6 @@ contract Launchpad is Ownable, ReentrancyGuard {
         bool launched;
         bool cancelled;
         address liquidityPool;
-        uint256 liquidityLockTime;
-        bool liquidityLocked;
     }
 
     uint256 public launchCount;
@@ -35,13 +33,11 @@ contract Launchpad is Ownable, ReentrancyGuard {
     LiquidityPool public immutable liquidityPool;
     uint256 public constant LAUNCH_FEE = 1000;
     uint256 public constant FEE_DENOMINATOR = 10000;
-    uint256 public constant DEFAULT_LIQUIDITY_LOCK_TIME = 365 days; // 1 year lock
 
     event LaunchCreated(uint256 indexed launchId, address indexed creator, address indexed token);
     event ContributionMade(uint256 indexed launchId, address indexed contributor, uint256 amount);
     event LaunchSuccessful(uint256 indexed launchId, uint256 raisedAmount);
     event LaunchCancelled(uint256 indexed launchId);
-    event LiquidityLocked(uint256 indexed launchId, address indexed liquidityPool, uint256 lockTime);
 
     constructor(ERC20 _baseToken, LiquidityPool _liquidityPool) Ownable(msg.sender) {
         baseToken = _baseToken;
@@ -79,9 +75,7 @@ contract Launchpad is Ownable, ReentrancyGuard {
             raisedAmount: 0,
             launched: false,
             cancelled: false,
-            liquidityPool: address(0),
-            liquidityLockTime: 0,
-            liquidityLocked: false
+            liquidityPool: address(0)
         });
 
         emit LaunchCreated(launchCount, msg.sender, token);
@@ -122,7 +116,11 @@ contract Launchpad is Ownable, ReentrancyGuard {
         launch.launched = true;
         
         // Create new liquidity pool for this token
-        LiquidityPool newPool = new LiquidityPool(baseToken, ERC20(launch.token));
+        LPToken newLPToken = new LPToken(address(this));
+        LiquidityPool newPool = new LiquidityPool(baseToken, ERC20(launch.token), newLPToken);
+        
+        // Transfer ownership of LP Token to the new LiquidityPool
+        newLPToken.transferOwnership(address(newPool));
         launch.liquidityPool = address(newPool);
         
         // Calculate amounts for liquidity provision (50% of raised funds)
@@ -137,15 +135,10 @@ contract Launchpad is Ownable, ReentrancyGuard {
         baseToken.approve(address(newPool), liquidityAmount);
         newPool.addLiquidity(liquidityAmount, tokenAmount);
         
-        // Set liquidity lock time and status
-        launch.liquidityLockTime = block.timestamp + DEFAULT_LIQUIDITY_LOCK_TIME;
-        launch.liquidityLocked = true;
-        
         // Transfer remaining funds to creator
         baseToken.safeTransfer(launch.creator, launch.raisedAmount - liquidityAmount);
         
         emit LaunchSuccessful(launchId, launch.raisedAmount);
-        emit LiquidityLocked(launchId, address(newPool), launch.liquidityLockTime);
     }
 
     function cancelLaunch(uint256 launchId) external nonReentrant {
@@ -187,71 +180,5 @@ contract Launchpad is Ownable, ReentrancyGuard {
         return launches[launchId].creator;
     }
 
-    /**
-     * @dev Check if liquidity is locked for a launch
-     * @param launchId The ID of the launch
-     */
-    function isLiquidityLocked(uint256 launchId) external view returns (bool) {
-        Launch storage launch = launches[launchId];
-        return launch.liquidityLocked && block.timestamp < launch.liquidityLockTime;
-    }
-
-    /**
-     * @dev Get liquidity lock information for a launch
-     * @param launchId The ID of the launch
-     */
-    function getLiquidityLockInfo(uint256 launchId) external view returns (
-        address poolAddress,
-        uint256 lockTime,
-        bool isLocked,
-        bool canUnlock
-    ) {
-        Launch storage launch = launches[launchId];
-        poolAddress = launch.liquidityPool;
-        lockTime = launch.liquidityLockTime;
-        isLocked = launch.liquidityLocked;
-        canUnlock = launch.liquidityLocked && block.timestamp >= launch.liquidityLockTime;
-    }
-
-    /**
-     * @dev Unlock liquidity after lock period expires (only creator can call)
-     * @param launchId The ID of the launch
-     */
-    function unlockLiquidity(uint256 launchId) external nonReentrant {
-        Launch storage launch = launches[launchId];
-        require(launch.creator == msg.sender, "not creator");
-        require(launch.liquidityLocked, "not locked");
-        require(block.timestamp >= launch.liquidityLockTime, "still locked");
-        
-        launch.liquidityLocked = false;
-        
-        // Transfer LP tokens to creator (they can now remove liquidity if they want)
-        LiquidityPool pool = LiquidityPool(launch.liquidityPool);
-        uint256 lpBalance = pool.lpToken().balanceOf(address(this));
-        if (lpBalance > 0) {
-            pool.lpToken().transfer(launch.creator, lpBalance);
-        }
-        
-        emit LiquidityLocked(launchId, launch.liquidityPool, 0); // 0 indicates unlocked
-    }
-
-    /**
-     * @dev Emergency unlock liquidity (only owner, for extreme cases)
-     * @param launchId The ID of the launch
-     */
-    function emergencyUnlockLiquidity(uint256 launchId) external onlyOwner {
-        Launch storage launch = launches[launchId];
-        require(launch.liquidityLocked, "not locked");
-        
-        launch.liquidityLocked = false;
-        
-        // Transfer LP tokens to creator
-        LiquidityPool pool = LiquidityPool(launch.liquidityPool);
-        uint256 lpBalance = pool.lpToken().balanceOf(address(this));
-        if (lpBalance > 0) {
-            pool.lpToken().transfer(launch.creator, lpBalance);
-        }
-        
-        emit LiquidityLocked(launchId, launch.liquidityPool, 0); // 0 indicates unlocked
-    }
+    // Simplified liquidity management - removed complex unlock functions to reduce size
 }
