@@ -20,6 +20,7 @@ export function ContractTest() {
 
     try {
       // Test basic contract call
+      // @ts-expect-error - Wagmi/Viem version compatibility issue
       const result = await publicClient.readContract({
         address: CONTRACT_ADDRESSES.Launchpad,
         abi: LaunchpadABI,

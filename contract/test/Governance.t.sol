@@ -55,7 +55,7 @@ contract GovernanceTest is Test {
         gov.vote(1, true);
         vm.expectRevert(bytes("Already voted"));
         gov.vote(1, true);
-        (,,uint yesVotes,uint noVotes,,bool executed,,,) = gov.proposals(1);
+        (,,uint yesVotes,uint noVotes,,,,,) = gov.proposals(1);
         assertTrue(yesVotes > 0);
         assertEq(noVotes, 0);
     }
