@@ -65,8 +65,6 @@ export function useLaunchpad() {
     
     try {
       const launchData: LaunchDetails[] = [];
-      
-      // Fetch all launches in parallel for better performance
       const launchPromises = [];
       for (let i = 0; i < Number(launchCount); i++) {
         launchPromises.push(
@@ -74,7 +72,7 @@ export function useLaunchpad() {
           publicClient.readContract({
             address: CONTRACT_ADDRESSES.Launchpad,
             abi: LaunchpadABI,
-            functionName: 'getLaunchDetails',
+            functionName: 'launches',
             args: [BigInt(i)],
           }).catch(err => {
             console.error(`Error fetching launch ${i}:`, err);
@@ -85,8 +83,26 @@ export function useLaunchpad() {
 
       const results = await Promise.all(launchPromises);
       
-      results.forEach((result) => {
-        if (result && Array.isArray(result) && result.length >= 9) {
+      // Fetch cancelled status for each launch
+      const cancelledPromises = [];
+      for (let i = 0; i < Number(launchCount); i++) {
+        cancelledPromises.push(
+          publicClient.readContract({
+            address: CONTRACT_ADDRESSES.Launchpad,
+            abi: LaunchpadABI,
+            functionName: 'isLaunchCancelled',
+            args: [BigInt(i)],
+          }).catch(err => {
+            console.error(`Error fetching cancelled status for launch ${i}:`, err);
+            return false;
+          })
+        );
+      }
+
+      const cancelledResults = await Promise.all(cancelledPromises);
+      
+      results.forEach((result, index) => {
+        if (result && Array.isArray(result) && result.length >= 12) {
           const launch: LaunchDetails = {
             token: result[0] as string,
             creator: result[1] as string,
@@ -94,24 +110,17 @@ export function useLaunchpad() {
             symbol: result[3] as string,
             totalSupply: result[4] as bigint,
             pricePerToken: result[5] as bigint,
-            raisedAmount: result[6] as bigint,
-            launched: result[7] as boolean,
-            cancelled: result[8] as boolean,
-            minContribution: BigInt(0), // These need to be fetched separately
-            maxContribution: BigInt(0),
-            startTime: BigInt(0),
-            endTime: BigInt(0),
+            minContribution: result[6] as bigint,
+            maxContribution: result[7] as bigint,
+            startTime: result[8] as bigint,
+            endTime: result[9] as bigint,
+            raisedAmount: result[10] as bigint,
+            launched: result[11] as boolean,
+            cancelled: Boolean(cancelledResults[index]) || false,
             liquidityPool: CONTRACT_ADDRESSES.LiquidityPool,
           };
           launchData.push(launch);
         }
-      });
-      
-      // Sort launches by index to maintain order
-      launchData.sort((a, b) => {
-        const aIndex = results.findIndex(r => r && Array.isArray(r) && r[0] === a.token);
-        const bIndex = results.findIndex(r => r && Array.isArray(r) && r[0] === b.token);
-        return aIndex - bIndex;
       });
       
       setLaunches(launchData);
@@ -161,6 +170,22 @@ export function useLaunchpad() {
       startTime: BigInt(Math.floor(Date.now() / 1000) + 2 * 24 * 60 * 60), // Starts in 2 days
       endTime: BigInt(Math.floor(Date.now() / 1000) + 9 * 24 * 60 * 60), // Ends in 9 days
       liquidityPool: CONTRACT_ADDRESSES.LiquidityPool,
+    },
+    {
+      token: "0x3456789012345678901234567890123456789012",
+      creator: "0xcdefabcdefabcdefabcdefabcdefabcdefabcdef",
+      name: "Ended Token",
+      symbol: "ENDED",
+      totalSupply: BigInt(200000 * 10**18),
+      pricePerToken: BigInt(5 * 10**15), // 0.005 AVAX
+      raisedAmount: BigInt(1000 * 10**18), // 1000 AVAX raised
+      launched: false,
+      cancelled: false,
+      minContribution: BigInt(1 * 10**15), // 0.001 AVAX
+      maxContribution: BigInt(20 * 10**18), // 20 AVAX
+      startTime: BigInt(Math.floor(Date.now() / 1000) - 10 * 24 * 60 * 60), // Started 10 days ago
+      endTime: BigInt(Math.floor(Date.now() / 1000) - 1 * 24 * 60 * 60), // Ended 1 day ago
+      liquidityPool: CONTRACT_ADDRESSES.LiquidityPool,
     }
   ];
 
@@ -199,7 +224,7 @@ export function useLaunchpad() {
 
   return {
     launches: error && launches.length === 0 ? getFallbackLaunches() : launches,
-    launchCount: Number(launchCount || 0) || (error ? 2 : 0),
+    launchCount: Number(launchCount || 0) || (error ? 3 : 0),
     loading,
     error,
     refetch,

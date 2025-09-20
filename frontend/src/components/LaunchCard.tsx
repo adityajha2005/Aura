@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatEther } from 'viem';
 import { LaunchDetails } from '@/hooks/useLaunchpad';
+import toast from 'react-hot-toast';
 
 // LaunchCard component for displaying individual launches
 interface LaunchCardProps {
@@ -55,8 +56,17 @@ export function LaunchCard({
     }
   };
 
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied to clipboard!`);
+  };
+
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
+    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 w-full max-w-sm mx-auto">
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-xl font-semibold text-white">
@@ -177,33 +187,66 @@ export function LaunchCard({
         </button>
 
         {showDetails && (
-          <div className="mt-4 p-4 bg-white/5 rounded-xl space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Token Address:</span>
-              <span className="text-white font-mono text-xs">{launch.token}</span>
+          <div className="mt-4 p-4 bg-white/5 rounded-xl space-y-3 text-sm">
+            <div className="space-y-1">
+              <span className="text-gray-300 text-xs">Token Address:</span>
+              <div className="flex items-center justify-between bg-white/5 p-2 rounded border border-white/10">
+                <span className="text-white font-mono text-xs">
+                  {truncateAddress(launch.token)}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(launch.token, 'Token address')}
+                  className="text-gray-400 hover:text-white transition-colors text-xs px-2 py-1 rounded hover:bg-white/10"
+                  title="Copy full address"
+                >
+                  📋
+                </button>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Creator:</span>
-              <span className="text-white font-mono text-xs">{launch.creator}</span>
+            <div className="space-y-1">
+              <span className="text-gray-300 text-xs">Creator:</span>
+              <div className="flex items-center justify-between bg-white/5 p-2 rounded border border-white/10">
+                <span className="text-white font-mono text-xs">
+                  {truncateAddress(launch.creator)}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(launch.creator, 'Creator address')}
+                  className="text-gray-400 hover:text-white transition-colors text-xs px-2 py-1 rounded hover:bg-white/10"
+                  title="Copy full address"
+                >
+                  📋
+                </button>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Liquidity Pool:</span>
-              <span className="text-white font-mono text-xs">{launch.liquidityPool}</span>
+            <div className="space-y-1">
+              <span className="text-gray-300 text-xs">Liquidity Pool:</span>
+              <div className="flex items-center justify-between bg-white/5 p-2 rounded border border-white/10">
+                <span className="text-white font-mono text-xs">
+                  {truncateAddress(launch.liquidityPool)}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(launch.liquidityPool, 'Liquidity pool address')}
+                  className="text-gray-400 hover:text-white transition-colors text-xs px-2 py-1 rounded hover:bg-white/10"
+                  title="Copy full address"
+                >
+                  📋
+                </button>
+              </div>
             </div>
             {launch.startTime > 0 && (
-              <div className="flex justify-between">
-                <span className="text-gray-300">Start Time:</span>
-                <span className="text-white text-xs">
+              <div className="space-y-1">
+                <span className="text-gray-300 text-xs">Start Time:</span>
+                <div className="text-white text-xs bg-white/5 p-2 rounded border border-white/10">
                   {new Date(Number(launch.startTime) * 1000).toLocaleString()}
-                </span>
+                </div>
               </div>
             )}
             {launch.endTime > 0 && (
-              <div className="flex justify-between">
-                <span className="text-gray-300">End Time:</span>
-                <span className="text-white text-xs">
+              <div className="space-y-1">
+                <span className="text-gray-300 text-xs">End Time:</span>
+                <div className="text-white text-xs bg-white/5 p-2 rounded border border-white/10">
                   {new Date(Number(launch.endTime) * 1000).toLocaleString()}
-                </span>
+                </div>
               </div>
             )}
           </div>
