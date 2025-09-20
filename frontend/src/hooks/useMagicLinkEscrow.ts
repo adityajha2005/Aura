@@ -571,9 +571,14 @@ ${typeof window !== 'undefined' ? window.location.origin : 'https://aura.app'}`;
     // Create mailto URL
     const mailtoUrl = `mailto:${encodeURIComponent(recipientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Open default email client
+    // Open default email client without navigation
     if (typeof window !== 'undefined') {
-      window.location.href = mailtoUrl;
+      const link = document.createElement('a');
+      link.href = mailtoUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
     
     return { subject, body, mailtoUrl };

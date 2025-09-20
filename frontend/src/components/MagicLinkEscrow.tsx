@@ -367,7 +367,7 @@ export default function MagicLinkEscrow() {
     if (!formData.secret) {
       setFormData(prev => ({ ...prev, secret: generateSecret() }));
     }
-  }, [formData.secret, generateSecret]); // Dependencies included
+  }, []); // Empty dependency array - only run once on mount
 
   // Check for URL parameters to auto-fill claim form
   useEffect(() => {
@@ -403,13 +403,13 @@ export default function MagicLinkEscrow() {
           token: TOKEN_OPTIONS[0].address,
           amount: '',
           expiration: EXPIRATION_OPTIONS[1].value,
-          secret: generateSecret(),
+          secret: '', // Clear secret, let the mount effect generate a new one
           recipientEmail: '',
         });
       }
       refetch();
     }
-  }, [isCreateSuccess, escrowCount, formData.secret, formData.recipientEmail, generateSecret, refetch]);
+  }, [isCreateSuccess, escrowCount, refetch]);
 
   // Refetch on other successful operations
   useEffect(() => {
@@ -485,16 +485,10 @@ export default function MagicLinkEscrow() {
       expirationTime
     );
 
-    // Reset form after sending email
-    setFormData({
-      token: TOKEN_OPTIONS[0].address,
-      amount: '',
-      expiration: EXPIRATION_OPTIONS[1].value,
-      secret: generateSecret(),
-      recipientEmail: '',
-    });
-    setCreatedEscrowId(null);
-    setCreatedEscrowSecret('');
+    // Clear the email field after a short delay to ensure email is sent first
+    setTimeout(() => {
+      setFormData(prev => ({ ...prev, recipientEmail: '' }));
+    }, 100);
   };
 
   const getTokenSymbol = (tokenAddress: string) => {
