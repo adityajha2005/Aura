@@ -6,7 +6,6 @@ import { formatEther, parseEther } from "viem";
 import toast from "react-hot-toast";
 import { useLaunchpad, useCreateTokenAndLaunch, useContribute, useLaunchManagement, LaunchFormData } from "@/hooks/useLaunchpad";
 import { LaunchCard } from "@/components/LaunchCard";
-import { ContractTest } from "@/components/ContractTest";
 
 export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");

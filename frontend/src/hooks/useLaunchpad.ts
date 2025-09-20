@@ -87,6 +87,7 @@ export function useLaunchpad() {
       const cancelledPromises = [];
       for (let i = 0; i < Number(launchCount); i++) {
         cancelledPromises.push(
+          // @ts-expect-error - Wagmi/Viem version compatibility issue
           publicClient.readContract({
             address: CONTRACT_ADDRESSES.Launchpad,
             abi: LaunchpadABI,
