@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
-import { parseEther, formatEther } from 'viem';
+import { parseEther } from 'viem';
 import { CONTRACT_ADDRESSES } from '@/config/contracts';
 import LaunchpadABI from '@/abis/Launchpad.json';
 
@@ -45,7 +45,7 @@ export function useLaunchpad() {
   });
 
   // Get all launches
-  const fetchLaunches = async () => {
+  const fetchLaunches = useCallback(async () => {
     // Check for launch count error first
     if (launchCountError) {
       setError(`Failed to connect to contract: ${launchCountError.message}`);
@@ -106,12 +106,12 @@ export function useLaunchpad() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [launchCount, publicClient, launchCountError]);
 
   useEffect(() => {
     console.log('Launchpad hook effect triggered:', { launchCount, publicClient: !!publicClient, launchCountError });
     fetchLaunches();
-  }, [launchCount, publicClient, launchCountError]);
+  }, [fetchLaunches, launchCount, publicClient, launchCountError]);
 
   // Fallback data for demo purposes when contract is not accessible
   const getFallbackLaunches = (): LaunchDetails[] => [

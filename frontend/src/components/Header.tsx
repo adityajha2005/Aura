@@ -70,7 +70,6 @@ function Header() {
             account,
             chain,
             openAccountModal,
-            openChainModal,
             openConnectModal,
             authenticationStatus,
             mounted,

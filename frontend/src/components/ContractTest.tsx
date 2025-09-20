@@ -26,8 +26,9 @@ export function ContractTest() {
       });
 
       setTestResult(`✅ Contract accessible! Launch count: ${result}`);
-    } catch (error: any) {
-      setTestResult(`❌ Contract error: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setTestResult(`❌ Contract error: ${errorMessage}`);
       console.error('Contract test error:', error);
     } finally {
       setIsTesting(false);
