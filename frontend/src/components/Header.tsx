@@ -131,7 +131,7 @@ function Header() {
 
                   return (
                     <div className="flex items-center space-x-2">
-                      <button
+                      {/* <button
                         onClick={openChainModal}
                         type="button"
                         className="backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 px-3 py-2 rounded-full text-white shadow-inner flex items-center space-x-2"
@@ -161,7 +161,7 @@ function Header() {
                           </div>
                         )}
                         {chain.name}
-                      </button>
+                      </button> */}
 
                       <button
                         onClick={openAccountModal}
