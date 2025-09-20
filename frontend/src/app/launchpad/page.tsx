@@ -1,42 +1,97 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { formatEther, parseEther } from "viem";
+import { useLaunchpad, useCreateTokenAndLaunch, useContribute, useLaunchManagement, LaunchFormData } from "@/hooks/useLaunchpad";
+import { CONTRACT_ADDRESSES } from "@/config/contracts";
+import { LaunchCard } from "@/components/LaunchCard";
+import { NetworkStatus } from "@/components/NetworkStatus";
+import { ContractTest } from "@/components/ContractTest";
 
 export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  
+  const { address } = useAccount();
+  const { launches, launchCount, loading, error, refetch } = useLaunchpad();
+  const { createTokenAndLaunch, isPending: isCreating, isSuccess: isCreateSuccess } = useCreateTokenAndLaunch();
+  const { contribute, isPending: isContributing } = useContribute();
+  const { finalizeLaunch, cancelLaunch, isPending: isManaging } = useLaunchManagement();
 
-  const projects = [
-    {
-      name: "DefiProtocol",
-      status: "Active",
-      raised: "$2.4M",
-      target: "$5M",
-      progress: 48,
-      riskScore: "Low",
-      participants: 1247,
-    },
-    {
-      name: "GameFi Arena",
-      status: "Upcoming",
-      raised: "$0",
-      target: "$3M",
-      progress: 0,
-      riskScore: "Medium",
-      participants: 0,
-    },
-    {
-      name: "NFT Market",
-      status: "Completed",
-      raised: "$8M",
-      target: "$8M",
-      progress: 100,
-      riskScore: "Low",
-      participants: 3421,
-    },
-  ];
+  const [formData, setFormData] = useState<LaunchFormData>({
+    name: "",
+    symbol: "",
+    totalSupply: "",
+    pricePerToken: "",
+    minContribution: "",
+    maxContribution: "",
+    duration: "7",
+  });
+
+  useEffect(() => {
+    if (isCreateSuccess) {
+      setShowCreateForm(false);
+      setFormData({
+        name: "",
+        symbol: "",
+        totalSupply: "",
+        pricePerToken: "",
+        minContribution: "",
+        maxContribution: "",
+        duration: "7",
+      });
+      refetch();
+    }
+  }, [isCreateSuccess, refetch]);
+
+  const handleFormChange = (field: keyof LaunchFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateLaunch = async () => {
+    if (!address) {
+      alert("Please connect your wallet");
+      return;
+    }
+
+    try {
+      await createTokenAndLaunch(formData);
+    } catch (error) {
+      console.error("Error creating launch:", error);
+    }
+  };
+
+  const handleContribute = async (launchId: number, amount: string) => {
+    if (!address) {
+      alert("Please connect your wallet");
+      return;
+    }
+
+    if (!amount) {
+      alert("Please enter contribution amount");
+      return;
+    }
+
+    try {
+      await contribute(launchId, amount);
+      refetch();
+    } catch (error) {
+      console.error("Error contributing:", error);
+    }
+  };
+
+  const calculateLaunchFee = () => {
+    if (!formData.totalSupply || !formData.pricePerToken) return "0";
+    const totalSupply = parseEther(formData.totalSupply);
+    const pricePerToken = parseEther(formData.pricePerToken);
+    const launchFee = (totalSupply * pricePerToken) / BigInt(10); // 10% fee
+    return formatEther(launchFee);
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden pt-20">
+      <NetworkStatus />
       {/* Static 3D Glass Cards Background */}
       <div className="absolute inset-0 z-0" style={{ perspective: "1000px" }}>
         {[...Array(6)].map((_, i) => (
@@ -96,85 +151,74 @@ export default function LaunchpadPage() {
         {/* Projects Tab */}
         {selectedTab === "projects" && (
           <div className="space-y-6">
+            <ContractTest />
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold text-white">
-                Active & Upcoming Projects
+                Active & Upcoming Projects ({launchCount})
               </h2>
-              <button className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white px-6 py-2 rounded-full transition-all duration-300">
+              <button 
+                onClick={() => setShowCreateForm(true)}
+                className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white px-6 py-2 rounded-full transition-all duration-300"
+              >
                 Launch Project
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {projects.map((project, index) => (
-                <div
-                  key={index}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+            {loading && (
+              <div className="text-center py-8">
+                <div className="text-white">Loading launches...</div>
+              </div>
+            )}
+
+            {error && (
+              <div className="text-center py-8">
+                <div className="text-red-400 mb-4">Error loading launches: {error}</div>
+                <button 
+                  onClick={() => refetch()}
+                  className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white px-6 py-2 rounded-full transition-all duration-300"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-semibold text-white">
-                      {project.name}
-                    </h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        project.status === "Active"
-                          ? "bg-green-500/20 text-green-400"
-                          : project.status === "Upcoming"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-blue-500/20 text-blue-400"
-                      }`}
-                    >
-                      {project.status}
-                    </span>
-                  </div>
+                  Retry
+                </button>
+              </div>
+            )}
 
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-gray-300">Progress</span>
-                        <span className="text-white">
-                          {project.raised} / {project.target}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-red-500 to-purple-500 h-2 rounded-full"
-                          style={{ width: `${project.progress}%` }}
-                        ></div>
-                      </div>
-                    </div>
+            {!loading && !error && launches.length === 0 && (
+              <div className="text-center py-8">
+                <div className="text-gray-300">No launches found. Be the first to launch a project!</div>
+              </div>
+            )}
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-gray-300 text-xs">Risk Score</div>
-                        <div
-                          className={`text-sm font-medium ${
-                            project.riskScore === "Low"
-                              ? "text-green-400"
-                              : project.riskScore === "Medium"
-                              ? "text-yellow-400"
-                              : "text-red-400"
-                          }`}
-                        >
-                          {project.riskScore}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-gray-300 text-xs">
-                          Participants
-                        </div>
-                        <div className="text-white text-sm font-medium">
-                          {project.participants.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-
-                    <button className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-2 rounded-xl transition-all duration-300">
-                      View Details
-                    </button>
-                  </div>
+            {error && launches.length > 0 && (
+              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span className="text-yellow-300 text-sm font-medium">
+                    Demo Mode
+                  </span>
                 </div>
-              ))}
+                <div className="text-white text-sm">
+                  Showing demo data. Contract connection failed: {error}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {launches.map((launch, index) => {
+                return (
+                  <LaunchCard
+                    key={index}
+                    launch={launch}
+                    launchId={index}
+                    onContribute={handleContribute}
+                    onFinalize={finalizeLaunch}
+                    onCancel={cancelLaunch}
+                    isContributing={isContributing}
+                    isManaging={isManaging}
+                    userAddress={address}
+                    isDemoMode={!!error}
+                  />
+                );
+              })}
             </div>
           </div>
         )}
@@ -191,33 +235,53 @@ export default function LaunchpadPage() {
                 <div className="space-y-6">
                   <div>
                     <label className="text-gray-300 text-sm mb-2 block">
-                      Project Name
+                      Token Name
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter project name"
+                      placeholder="Enter token name"
+                      value={formData.name}
+                      onChange={(e) => handleFormChange("name", e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
 
                   <div>
                     <label className="text-gray-300 text-sm mb-2 block">
-                      Funding Target
+                      Token Symbol
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., TOKEN"
+                      value={formData.symbol}
+                      onChange={(e) => handleFormChange("symbol", e.target.value.toUpperCase())}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-gray-300 text-sm mb-2 block">
+                      Total Supply
                     </label>
                     <input
                       type="number"
-                      placeholder="Target amount in USD"
+                      placeholder="Total token supply"
+                      value={formData.totalSupply}
+                      onChange={(e) => handleFormChange("totalSupply", e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
 
                   <div>
                     <label className="text-gray-300 text-sm mb-2 block">
-                      Token Contract
+                      Price per Token (AVAX)
                     </label>
                     <input
-                      type="text"
-                      placeholder="0x..."
+                      type="number"
+                      step="0.000001"
+                      placeholder="Price in AVAX"
+                      value={formData.pricePerToken}
+                      onChange={(e) => handleFormChange("pricePerToken", e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
                     />
                   </div>
@@ -226,25 +290,46 @@ export default function LaunchpadPage() {
                 <div className="space-y-6">
                   <div>
                     <label className="text-gray-300 text-sm mb-2 block">
-                      Launch Duration
+                      Min Contribution (AVAX)
                     </label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30">
-                      <option value="">Select duration</option>
-                      <option value="7">7 days</option>
-                      <option value="14">14 days</option>
-                      <option value="30">30 days</option>
-                    </select>
+                    <input
+                      type="number"
+                      step="0.001"
+                      placeholder="Minimum contribution"
+                      value={formData.minContribution}
+                      onChange={(e) => handleFormChange("minContribution", e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                    />
                   </div>
 
                   <div>
                     <label className="text-gray-300 text-sm mb-2 block">
-                      Liquidity Lock Period
+                      Max Contribution (AVAX)
                     </label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30">
-                      <option value="">Select lock period</option>
-                      <option value="6">6 months</option>
-                      <option value="12">12 months</option>
-                      <option value="24">24 months</option>
+                    <input
+                      type="number"
+                      step="0.001"
+                      placeholder="Maximum contribution"
+                      value={formData.maxContribution}
+                      onChange={(e) => handleFormChange("maxContribution", e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-gray-300 text-sm mb-2 block">
+                      Launch Duration (Days)
+                    </label>
+                    <select 
+                      value={formData.duration}
+                      onChange={(e) => handleFormChange("duration", e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30"
+                    >
+                      <option value="1">1 day</option>
+                      <option value="3">3 days</option>
+                      <option value="7">7 days</option>
+                      <option value="14">14 days</option>
+                      <option value="30">30 days</option>
                     </select>
                   </div>
 
@@ -252,18 +337,22 @@ export default function LaunchpadPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
                       <span className="text-purple-300 text-sm font-medium">
-                        AI Security Analysis
+                        Launch Fee
                       </span>
                     </div>
                     <div className="text-white text-sm">
-                      Contract will be analyzed automatically
+                      {calculateLaunchFee()} AVAX (10% of total value)
                     </div>
                   </div>
                 </div>
               </div>
 
-              <button className="w-full mt-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white font-semibold py-4 rounded-xl transition-all duration-300">
-                Submit for Review
+              <button 
+                onClick={handleCreateLaunch}
+                disabled={isCreating || !address}
+                className="w-full mt-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all duration-300"
+              >
+                {isCreating ? "Creating Launch..." : !address ? "Connect Wallet to Launch" : "Create Token & Launch"}
               </button>
             </div>
           </div>
@@ -381,6 +470,161 @@ export default function LaunchpadPage() {
           </div>
         )}
       </div>
+
+      {/* Create Launch Modal */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold text-white">
+                Create Token & Launch
+              </h2>
+              <button
+                onClick={() => setShowCreateForm(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-gray-300 text-sm mb-2 block">
+                    Token Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter token name"
+                    value={formData.name}
+                    onChange={(e) => handleFormChange("name", e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-gray-300 text-sm mb-2 block">
+                    Token Symbol
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., TOKEN"
+                    value={formData.symbol}
+                    onChange={(e) => handleFormChange("symbol", e.target.value.toUpperCase())}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-gray-300 text-sm mb-2 block">
+                    Total Supply
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Total token supply"
+                    value={formData.totalSupply}
+                    onChange={(e) => handleFormChange("totalSupply", e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-gray-300 text-sm mb-2 block">
+                    Price per Token (AVAX)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    placeholder="Price in AVAX"
+                    value={formData.pricePerToken}
+                    onChange={(e) => handleFormChange("pricePerToken", e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-gray-300 text-sm mb-2 block">
+                    Min Contribution (AVAX)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    placeholder="Minimum contribution"
+                    value={formData.minContribution}
+                    onChange={(e) => handleFormChange("minContribution", e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-gray-300 text-sm mb-2 block">
+                    Max Contribution (AVAX)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    placeholder="Maximum contribution"
+                    value={formData.maxContribution}
+                    onChange={(e) => handleFormChange("maxContribution", e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-gray-300 text-sm mb-2 block">
+                  Launch Duration (Days)
+                </label>
+                <select 
+                  value={formData.duration}
+                  onChange={(e) => handleFormChange("duration", e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none focus:border-white/30"
+                >
+                  <option value="1">1 day</option>
+                  <option value="3">3 days</option>
+                  <option value="7">7 days</option>
+                  <option value="14">14 days</option>
+                  <option value="30">30 days</option>
+                </select>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-300/30 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                  <span className="text-purple-300 text-sm font-medium">
+                    Launch Fee
+                  </span>
+                </div>
+                <div className="text-white text-sm">
+                  {calculateLaunchFee()} AVAX (10% of total value)
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowCreateForm(false)}
+                  className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleCreateLaunch}
+                  disabled={isCreating || !address}
+                  className="flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                >
+                  {isCreating ? "Creating..." : !address ? "Connect Wallet" : "Create & Launch"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
