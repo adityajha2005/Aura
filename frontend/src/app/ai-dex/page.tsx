@@ -578,14 +578,25 @@ export default function AIDexPage() {
                     </motion.div>
                   ))}
                 </div>
-              </motion.div>
+                <div className="text-gray-300">Low Volatility</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-yellow-400 mb-2">
+                  0.15%
+                </div>
+                <div className="text-gray-300">Current Rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-red-400 mb-2">
+                  0.30%
+                </div>
+                <div className="text-gray-300">High Volatility</div>
+              </div>
+            </div>
+          </div>
+        )}
 
-              {/* AI Governance Integration */}
-              <AIGovernanceIntegration />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }
