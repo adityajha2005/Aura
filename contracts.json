@@ -1,0 +1,109 @@
+{
+  "network": "Avalanche Fuji Testnet",
+  "chainId": 43113,
+  "currency": "AVAX",
+  "deploymentBlock": 46176037,
+  "contracts": {
+    "TestTokens": {
+      "address": "0x246B2a6C376Df8299C90A717aE4661599F636BDD",
+      "name": "Test Token",
+      "symbol": "TEST",
+      "decimals": 18,
+      "description": "Base test token for the platform"
+    },
+    "AuraGovernanceToken": {
+      "address": "0x9947056cC11E283617De19336236Da8f4CcE8BD2",
+      "name": "Aura Governance Token",
+      "symbol": "AGOV",
+      "decimals": 18,
+      "initialSupply": "1000000000000000000000000",
+      "description": "Governance token with voting capabilities"
+    },
+    "LPToken": {
+      "address": "0xD9E8A86205a881072924981d3e6124183C8C5a27",
+      "name": "Aura LP Token",
+      "symbol": "ALP",
+      "decimals": 18,
+      "description": "Liquidity provider token representing pool shares"
+    },
+    "LiquidityPool": {
+      "address": "0x8bCcb416986C47aBb7CD2C2D57135C0f5405A7d3",
+      "tokenA": "0x246B2a6C376Df8299C90A717aE4661599F636BDD",
+      "tokenB": "0x9947056cC11E283617De19336236Da8f4CcE8BD2",
+      "lpToken": "0xD9E8A86205a881072924981d3e6124183C8C5a27",
+      "initialFee": 30,
+      "description": "Main AMM liquidity pool for token swaps"
+    },
+    "Governance": {
+      "address": "0xb0E19E6795F38a66bf5bbB6fC5F314E16BCbAFE9",
+      "linkedLiquidityPool": "0x8bCcb416986C47aBb7CD2C2D57135C0f5405A7d3",
+      "linkedGovernanceToken": "0x9947056cC11E283617De19336236Da8f4CcE8BD2",
+      "votingPeriod": 604800,
+      "description": "DAO governance system for protocol management"
+    },
+    "Launchpad": {
+      "address": "0x105E62d8d558a68587a61610e89BcA5D368A0C9e",
+      "baseToken": "0x246B2a6C376Df8299C90A717aE4661599F636BDD",
+      "linkedLiquidityPool": "0x8bCcb416986C47aBb7CD2C2D57135C0f5405A7d3",
+      "launchFee": 1000,
+      "description": "Platform for launching new tokens with liquidity provision"
+    },
+    "MagicLinkEscrow": {
+      "address": "0x60dA497b872642B25aff3d202ca162590c2888b2",
+      "defaultExpiration": 2592000,
+      "maxExpiration": 31536000,
+      "description": "Escrow system for secure token transfers via magic links",
+      "note": "Updated: claimEscrow function now accepts bytes32 secret parameter instead of string"
+    }
+  },
+  "relationships": {
+    "Governance": {
+      "controls": ["LiquidityPool"],
+      "uses": ["AuraGovernanceToken", "LiquidityPool"]
+    },
+    "LiquidityPool": {
+      "managedBy": "Governance",
+      "tokens": ["TestTokens", "AuraGovernanceToken"],
+      "lpToken": "LPToken"
+    },
+    "Launchpad": {
+      "uses": ["TestTokens", "LiquidityPool"],
+      "creates": ["LiquidityPool", "LPToken"]
+    },
+    "LPToken": {
+      "ownedBy": "LiquidityPool",
+      "represents": "LiquidityPool shares"
+    }
+  },
+  "deployment": {
+    "deployer": "0x0003613a5FBbdB74c7E5af87AB1D6338453391A3",
+    "deploymentDate": "2025-09-20",
+    "gasUsed": {
+      "TestTokens": 1099596,
+      "AuraGovernanceToken": 3732551,
+      "LPToken": 1099533,
+      "LiquidityPool": 1883917,
+      "Governance": 1993744,
+      "Launchpad": 7632862,
+      "MagicLinkEscrow": 2596582
+    },
+    "transactionHashes": {
+      "TestTokens": "0x7e7f7f630eb75408d5f844aea95b5654cc6365f66975fd194a408e04f5ea6811",
+      "AuraGovernanceToken": "0x2b28050b227bde6b70fbd6916b7f326fdba1768ca27c34dcdd0a6942dc70a00a",
+      "LPToken": "0xccd2cf5051ba0cc85ff3a6681c45cf1320cec400f7376b3079c02f7330030369",
+      "LiquidityPool": "0x2759119ac56a120514df3b975bb0ae48a343db34d1544ef37fb6e54337e510ec",
+      "Governance": "0xf4299b4bc8a8890be89e674e37ca33459e6bcb4543dfae800303b810b31ba957",
+      "Launchpad": "0xb52cf1e3e5b202463fb30b3c6f7f01f0daac85bd53cb7484fa0b66541ba15cbf",
+      "MagicLinkEscrow": "0xafd668c4ea8479e50d2bbea81b5cf43f3a3114f6e68d8e04e422ae6e9105756b"
+    }
+  },
+  "updates": {
+    "2025-09-20": {
+      "MagicLinkEscrow": {
+        "change": "Updated claimEscrow function parameter from 'string memory secret' to 'bytes32 secret'",
+        "impact": "ABI updated, frontend integration needs to pass bytes32 instead of string",
+        "breaking": true
+      }
+    }
+  }
+}
