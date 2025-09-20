@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Header from "../components/Header";
+import { StarsBackground } from "@/components/ui/stars-background";
+import { ttFirsNeue, dmSans } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,9 +17,27 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`antialiased font-sans ${ttFirsNeue.variable} ${dmSans.variable}`}
       >
-        {children}
+        <div className="min-h-screen w-full  relative overflow-hidden">
+          <StarsBackground
+            className="z-10"
+            starDensity={0.0001}
+            minTwinkleSpeed={0.3}
+            maxTwinkleSpeed={1.2}
+          />
+
+          <div
+            className="absolute inset-0 z-10 pointer-events-none"
+            style={{
+              backgroundImage: `
+       radial-gradient(circle at center, rgba(255, 0, 0, 0.18), transparent)
+     `,
+            }}
+          />
+          <Header />
+          {children}
+        </div>
       </body>
     </html>
   );
