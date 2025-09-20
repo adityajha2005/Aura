@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import { parseEther } from 'viem';
+import toast from 'react-hot-toast';
 import { CONTRACT_ADDRESSES } from '@/config/contracts';
 import LaunchpadABI from '@/abis/Launchpad.json';
 
@@ -64,8 +65,6 @@ export function useLaunchpad() {
     
     try {
       const launchData: LaunchDetails[] = [];
-      
-      // Create promises for all launch data fetches
       const launchPromises = [];
       for (let i = 0; i < Number(launchCount); i++) {
         launchPromises.push(
@@ -189,12 +188,44 @@ export function useLaunchpad() {
     }
   ];
 
+  // Enhanced refetch function that also refreshes the launch count
+  const refetch = useCallback(async () => {
+    console.log('Refetching launches...');
+    
+    // First, try to get the latest launch count directly
+    if (publicClient) {
+      try {
+        const latestCount = await publicClient.readContract({
+          address: CONTRACT_ADDRESSES.Launchpad,
+          abi: LaunchpadABI,
+          functionName: 'launchCount',
+        });
+        console.log('Latest launch count:', Number(latestCount));
+        
+        // If the count has changed, fetch all launches
+        if (Number(latestCount) !== Number(launchCount)) {
+          console.log('Launch count changed, refetching all launches...');
+          await fetchLaunches();
+        } else {
+          // Just refetch the existing launches
+          await fetchLaunches();
+        }
+      } catch (err) {
+        console.error('Error getting latest launch count:', err);
+        // Fallback to regular fetch
+        await fetchLaunches();
+      }
+    } else {
+      await fetchLaunches();
+    }
+  }, [fetchLaunches, publicClient, launchCount]);
+
   return {
     launches: error && launches.length === 0 ? getFallbackLaunches() : launches,
     launchCount: Number(launchCount || 0) || (error ? 3 : 0),
     loading,
     error,
-    refetch: fetchLaunches,
+    refetch,
   };
 }
 
@@ -215,6 +246,8 @@ export function useCreateTokenAndLaunch() {
       // Calculate launch fee (10% of total supply * price per token)
       const launchFee = (totalSupply * pricePerToken) / BigInt(10);
 
+      toast.loading('Creating token and launch...', { id: 'create-launch' });
+
       await writeContract({
         address: CONTRACT_ADDRESSES.Launchpad,
         abi: LaunchpadABI,
@@ -232,8 +265,18 @@ export function useCreateTokenAndLaunch() {
       });
     } catch (err) {
       console.error('Error creating token and launch:', err);
+      toast.error('Failed to create token and launch', { id: 'create-launch' });
     }
   };
+
+  // Show success/error toasts based on transaction status
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('Token created and launch started successfully!', { id: 'create-launch' });
+    } else if (error) {
+      toast.error(`Transaction failed: ${error.message}`, { id: 'create-launch' });
+    }
+  }, [isSuccess, error]);
 
   return {
     createTokenAndLaunch,
@@ -255,6 +298,8 @@ export function useContribute() {
     try {
       const contributionAmount = parseEther(amount);
       
+      toast.loading(`Contributing ${amount} AVAX to launch...`, { id: 'contribute' });
+      
       await writeContract({
         address: CONTRACT_ADDRESSES.Launchpad,
         abi: LaunchpadABI,
@@ -263,8 +308,18 @@ export function useContribute() {
       });
     } catch (err) {
       console.error('Error contributing to launch:', err);
+      toast.error('Failed to contribute to launch', { id: 'contribute' });
     }
   };
+
+  // Show success/error toasts based on transaction status
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('Contribution successful!', { id: 'contribute' });
+    } else if (error) {
+      toast.error(`Contribution failed: ${error.message}`, { id: 'contribute' });
+    }
+  }, [isSuccess, error]);
 
   return {
     contribute,
@@ -284,6 +339,8 @@ export function useLaunchManagement() {
 
   const finalizeLaunch = async (launchId: number) => {
     try {
+      toast.loading('Finalizing launch...', { id: 'finalize-launch' });
+      
       await writeContract({
         address: CONTRACT_ADDRESSES.Launchpad,
         abi: LaunchpadABI,
@@ -292,11 +349,14 @@ export function useLaunchManagement() {
       });
     } catch (err) {
       console.error('Error finalizing launch:', err);
+      toast.error('Failed to finalize launch', { id: 'finalize-launch' });
     }
   };
 
   const cancelLaunch = async (launchId: number) => {
     try {
+      toast.loading('Cancelling launch...', { id: 'cancel-launch' });
+      
       await writeContract({
         address: CONTRACT_ADDRESSES.Launchpad,
         abi: LaunchpadABI,
@@ -305,8 +365,18 @@ export function useLaunchManagement() {
       });
     } catch (err) {
       console.error('Error cancelling launch:', err);
+      toast.error('Failed to cancel launch', { id: 'cancel-launch' });
     }
   };
+
+  // Show success/error toasts based on transaction status
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('Launch action completed successfully!', { id: 'launch-action' });
+    } else if (error) {
+      toast.error(`Launch action failed: ${error.message}`, { id: 'launch-action' });
+    }
+  }, [isSuccess, error]);
 
   return {
     finalizeLaunch,

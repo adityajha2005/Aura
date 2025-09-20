@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { usePublicClient } from 'wagmi';
+import toast from 'react-hot-toast';
 import { CONTRACT_ADDRESSES } from '@/config/contracts';
 import LaunchpadABI from '@/abis/Launchpad.json';
 
@@ -26,9 +27,11 @@ export function ContractTest() {
       });
 
       setTestResult(`✅ Contract accessible! Launch count: ${result}`);
+      toast.success('Contract connection successful!');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setTestResult(`❌ Contract error: ${errorMessage}`);
+      toast.error(`Contract connection failed: ${errorMessage}`);
       console.error('Contract test error:', error);
     } finally {
       setIsTesting(false);

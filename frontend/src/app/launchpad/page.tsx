@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatEther, parseEther } from "viem";
+import toast from "react-hot-toast";
 import { useLaunchpad, useCreateTokenAndLaunch, useContribute, useLaunchManagement, LaunchFormData } from "@/hooks/useLaunchpad";
 import { LaunchCard } from "@/components/LaunchCard";
-import { NetworkStatus } from "@/components/NetworkStatus";
 import { ContractTest } from "@/components/ContractTest";
 
 export default function LaunchpadPage() {
@@ -40,7 +40,10 @@ export default function LaunchpadPage() {
         maxContribution: "",
         duration: "7",
       });
-      refetch();
+      // Add a small delay to ensure the transaction is fully processed
+      setTimeout(() => {
+        refetch();
+      }, 1000);
     }
   }, [isCreateSuccess, refetch]);
 
@@ -50,7 +53,13 @@ export default function LaunchpadPage() {
 
   const handleCreateLaunch = async () => {
     if (!address) {
-      alert("Please connect your wallet");
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
+    // Validate form data
+    if (!formData.name || !formData.symbol || !formData.totalSupply || !formData.pricePerToken) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -58,25 +67,30 @@ export default function LaunchpadPage() {
       await createTokenAndLaunch(formData);
     } catch (error) {
       console.error("Error creating launch:", error);
+      toast.error("Failed to create launch");
     }
   };
 
   const handleContribute = async (launchId: number, amount: string) => {
     if (!address) {
-      alert("Please connect your wallet");
+      toast.error("Please connect your wallet first");
       return;
     }
 
-    if (!amount) {
-      alert("Please enter contribution amount");
+    if (!amount || parseFloat(amount) <= 0) {
+      toast.error("Please enter a valid contribution amount");
       return;
     }
 
     try {
       await contribute(launchId, amount);
-      refetch();
+      // Add a small delay to ensure the transaction is fully processed
+      setTimeout(() => {
+        refetch();
+      }, 1000);
     } catch (error) {
       console.error("Error contributing:", error);
+      toast.error("Failed to contribute");
     }
   };
 
@@ -90,7 +104,6 @@ export default function LaunchpadPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden pt-20">
-      <NetworkStatus />
       {/* Static 3D Glass Cards Background */}
       <div className="absolute inset-0 z-0" style={{ perspective: "1000px" }}>
         {[...Array(6)].map((_, i) => (
