@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+requests
+aiohttp
+numpy
+scikit-learn
+pydantic
+python-dotenv
+web3
+pythclient

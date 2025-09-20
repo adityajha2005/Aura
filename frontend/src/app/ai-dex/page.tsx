@@ -1,16 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { AnimatedAIInsights } from "../../components/AnimatedAIInsights";
+import { InteractiveChart } from "../../components/InteractiveChart";
+
+import GlowButton from "@/components/ui/glow-button";
 
 export default function AIDexPage() {
   const [selectedTab, setSelectedTab] = useState("trade");
 
   return (
     <div className="min-h-screen relative overflow-hidden pt-20">
+      {/* Enhanced Animated Background */}
+ 
+
       {/* Static 3D Glass Cards Background */}
-      <div className="absolute inset-0 z-0" style={{ perspective: "1000px" }}>
+      <div className="absolute inset-0 z-10" style={{ perspective: "1000px" }}>
         {[...Array(5)].map((_, i) => (
-          <div
+          <motion.div
             key={i}
             className={`absolute w-32 h-40 bg-white/2 backdrop-blur-sm rounded-xl border border-white/5 shadow-xl`}
             style={{
@@ -21,243 +29,543 @@ export default function AIDexPage() {
               }deg) rotateX(8deg) scale(0.8)`,
               transformOrigin: "center center",
             }}
+            animate={{
+              rotateY: [(i - 2) * 15, (i - 2) * 15 + 5, (i - 2) * 15],
+              scale: [0.8, 0.85, 0.8],
+            }}
+            transition={{
+              duration: 4 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           />
         ))}
       </div>
 
       {/* Main Content */}
-      <div className="relative z-20 max-w-7xl mx-auto px-4 py-8">
+      <motion.div
+        className="relative z-20 max-w-7xl mx-auto px-4 py-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
+          <motion.h1
             className="text-5xl font-bold text-white mb-4"
             style={{
               fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
             }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
           >
             AI-Governed DEX
-          </h1>
-          <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+          </motion.h1>
+          <motion.p
+            className="text-gray-300 text-lg max-w-3xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+          >
             Experience the future of decentralized trading with our AI-powered
             exchange that optimizes fees in real-time based on market
             conditions.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center mb-8">
+        <motion.div
+          className="flex justify-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+        >
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex">
-            {["trade", "analytics", "fees"].map((tab) => (
-              <button
+            {["trade", "analytics", "fees"].map((tab, index) => (
+              <motion.button
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
-                className={`px-6 py-2 rounded-full transition-all duration-300 capitalize ${
+                className={`px-6 py-2 rounded-full transition-all duration-300 capitalize relative ${
                   selectedTab === tab
-                    ? "bg-white/20 text-white"
+                    ? "text-white"
                     : "text-gray-300 hover:text-white hover:bg-white/10"
                 }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 + index * 0.1, duration: 0.3 }}
               >
-                {tab}
-              </button>
+                {selectedTab === tab && (
+                  <motion.div
+                    className="absolute inset-0 bg-white/20 rounded-full"
+                    layoutId="activeTab"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{tab}</span>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Trading Interface */}
-        {selectedTab === "trade" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Swap Card */}
-            <div className="lg:col-span-2">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-                <h3 className="text-2xl font-semibold text-white mb-6">
-                  Swap Tokens
-                </h3>
-
-                {/* From Token */}
-                <div className="mb-4">
-                  <label className="text-gray-300 text-sm mb-2 block">
-                    From
-                  </label>
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
-                      <span className="text-white font-medium">AVAX</span>
-                    </div>
-                    <input
-                      type="number"
-                      placeholder="0.0"
-                      className="bg-transparent text-white text-xl text-right outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Swap Arrow */}
-                <div className="flex justify-center my-4">
-                  <button className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-full p-2 transition-all duration-300">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+        {/* Tab Content */}
+        <AnimatePresence mode="wait">
+          {/* Trading Interface */}
+          {selectedTab === "trade" && (
+            <motion.div
+              key="trade"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Swap Card */}
+              <motion.div
+                className="lg:col-span-2"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1, duration: 0.4 }}
+              >
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
+                  <h3 className="text-2xl font-semibold text-white mb-6">
+                    Swap Tokens
+                  </h3>
+                  {/* From Token */}
+                  <motion.div
+                    className="mb-4"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.3 }}
+                  >
+                    <label className="text-gray-300 text-sm mb-2 block">
+                      From
+                    </label>
+                    <motion.div
+                      className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center hover:bg-white/10 transition-all duration-300"
+                      whileHover={{ scale: 1.02 }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          className="w-8 h-8 bg-blue-500 rounded-full"
+                          whileHover={{ rotate: 360 }}
+                          transition={{ duration: 0.5 }}
+                        />
+                        <span className="text-white font-medium">AVAX</span>
+                      </div>
+                      <motion.input
+                        type="number"
+                        placeholder="0.0"
+                        className="bg-transparent text-white text-xl text-right outline-none"
+                        whileFocus={{ scale: 1.02 }}
                       />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* To Token */}
-                <div className="mb-6">
-                  <label className="text-gray-300 text-sm mb-2 block">To</label>
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-red-500 rounded-full"></div>
-                      <span className="text-white font-medium">AURA</span>
+                    </motion.div>
+                  </motion.div>{" "}
+                  {/* Swap Arrow */}
+                  {/* Swap Arrow */}
+                  <motion.div
+                    className="flex justify-center my-4"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                  >
+                    <motion.button
+                      className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-full p-2 transition-all duration-300"
+                      whileHover={{ rotate: 180, scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                        />
+                      </svg>
+                    </motion.button>
+                  </motion.div>
+                  {/* To Token */}
+                  <motion.div
+                    className="mb-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.3 }}
+                  >
+                    <label className="text-gray-300 text-sm mb-2 block">
+                      To
+                    </label>
+                    <motion.div
+                      className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-center hover:bg-white/10 transition-all duration-300"
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          className="w-8 h-8  rounded-full"
+                          whileHover={{ rotate: 360 }}
+                          transition={{ duration: 0.5 }}
+                        />
+                        <span className="text-white font-medium">AURA</span>
+                      </div>
+                      <motion.input
+                        type="number"
+                        placeholder="0.0"
+                        className="bg-transparent text-white text-xl text-right outline-none"
+                        whileFocus={{ scale: 1.02 }}
+                      />
+                    </motion.div>
+                  </motion.div>
+                  {/* AI Fee Display */}
+                  <motion.div
+                    className="bg-gradient-to-r from-red-900/20 via-black/20 to-gray-800/20 border border-red-800/30 rounded-xl p-4 mb-6 backdrop-blur-sm"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5, duration: 0.3 }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <motion.div
+                        className="w-2 h-2 bg-red-400 rounded-full"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <span className="text-red-300 text-sm font-medium">
+                        AI-Optimized Fee
+                      </span>
                     </div>
-                    <input
-                      type="number"
-                      placeholder="0.0"
-                      className="bg-transparent text-white text-xl text-right outline-none"
-                    />
-                  </div>
-                </div>
+                    <motion.div
+                      className="text-white text-lg font-semibold"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.7, duration: 0.3 }}
+                    >
+                      0.15% (Dynamic)
+                    </motion.div>
+                    <motion.div
+                      className="text-gray-300 text-xs"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8, duration: 0.3 }}
+                    >
+                      Fee reduced due to high liquidity
+                    </motion.div>
+                  </motion.div>
+                  {/* Enhanced Swap Button */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.3 }}
+                    className="relative"
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <GlowButton
+                        variant="red"
+                        className="w-full py-4 px-6 text-lg flex flex-col font-semibold"
+                      >
+                        <motion.div
+                          className="flex items-center justify-center gap-3"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.8, duration: 0.3 }}
+                        >
+                          <motion.svg
+                            className="w-5 h-5 text-white"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            animate={{ rotate: [0, 180, 360] }}
+                            transition={{
+                              duration: 4,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                          >
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                          </motion.svg>
+                          <span className="text-white">Swap Tokens</span>
+                        </motion.div>
+                      </GlowButton>
+                    </motion.div>
 
-                {/* AI Fee Display */}
-                <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-300/30 rounded-xl p-4 mb-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                    <span className="text-purple-300 text-sm font-medium">
-                      AI-Optimized Fee
-                    </span>
-                  </div>
-                  <div className="text-white text-lg font-semibold">
-                    0.15% (Dynamic)
-                  </div>
-                  <div className="text-gray-300 text-xs">
-                    Fee reduced due to high liquidity
-                  </div>
-                </div>
+                   
 
-                {/* Swap Button */}
-                <button className="w-full bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white font-semibold py-4 rounded-xl transition-all duration-300">
-                  Swap Tokens
-                </button>
-              </div>
-            </div>
+                    {/* Particle effects on hover */}
+                    <motion.div className="absolute inset-0 pointer-events-none">
+                      {[...Array(6)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute w-1 h-1 bg-white rounded-full opacity-0"
+                          style={{
+                            left: `${20 + i * 10}%`,
+                            top: `${40 + Math.random() * 20}%`,
+                          }}
+                          whileHover={{
+                            opacity: [0, 1, 0],
+                            scale: [0, 1.5, 0],
+                            y: [0, -20, -40],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            delay: i * 0.1,
+                            repeat: Infinity,
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </motion.div>
 
-            {/* Market Stats */}
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  Market Stats
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">24h Volume</span>
-                    <span className="text-white font-semibold">$2.4M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">TVL</span>
-                    <span className="text-white font-semibold">$12.8M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Active Pairs</span>
-                    <span className="text-white font-semibold">42</span>
-                  </div>
-                </div>
-              </div>
+              {/* Market Stats */}
+              <motion.div
+                className="space-y-6"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+              >
+                {/* Assets Balance Card */}
+                <motion.div
+                  className="relative bg-gradient-to-br from-red-900/20 via-black/40 to-gray-800/20 backdrop-blur-md border border-red-800/20 rounded-2xl p-6 overflow-hidden group"
+                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.4 }}
+                >
+                  {/* Gradient overlay effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 via-transparent to-gray-400/10 group-hover:from-red-400/20 group-hover:to-gray-400/20 transition-all duration-500" />
 
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  AI Insights
-                </h3>
-                <div className="space-y-3">
-                  <div className="text-green-400 text-sm">
-                    • Optimal trading conditions detected
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-gray-300 text-sm font-medium">
+                        Assets Balance
+                      </h3>
+                      <div className="w-4 h-4 border border-gray-400 rounded-full flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                      </div>
+                    </div>
+                    <motion.div
+                      className="text-4xl font-bold text-white mb-4"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.5, duration: 0.4 }}
+                    >
+                      $19,600
+                    </motion.div>
+                    <div className="flex gap-3">
+                      <motion.button
+                        className="px-6 py-2 bg-red-800/80 hover:bg-red-700 text-white rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden group"
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0 8px 25px rgba(185, 28, 28, 0.4)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {/* Button shimmer effect */}
+                        <motion.div
+                          className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                          whileHover={{ translateX: "200%" }}
+                          transition={{ duration: 0.6 }}
+                        />
+                        <span className="relative z-10">Stake</span>
+                      </motion.button>
+                      <motion.button
+                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300 relative overflow-hidden group"
+                        whileHover={{
+                          scale: 1.05,
+                          borderColor: "rgba(255, 255, 255, 0.4)",
+                          boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {/* Button glow effect */}
+                        <motion.div
+                          className="absolute inset-0 bg-white/5 opacity-0"
+                          whileHover={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                        <span className="relative z-10">Unstake</span>
+                      </motion.button>
+                    </div>
                   </div>
-                  <div className="text-yellow-400 text-sm">
-                    • Moderate volatility expected
+                </motion.div>
+
+                {/* Pool Balance Card */}
+                <motion.div
+                  className="relative bg-gradient-to-br from-gray-800/20 via-black/40 to-red-900/20 backdrop-blur-md border border-gray-700/20 rounded-2xl p-6 overflow-hidden group"
+                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.4 }}
+                >
+                  {/* Gradient overlay effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-400/10 via-transparent to-red-400/10 group-hover:from-gray-400/20 group-hover:to-red-400/20 transition-all duration-500" />
+
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-gray-300 text-sm font-medium">
+                        Pool Balance
+                      </h3>
+                      <div className="w-4 h-4 border border-gray-400 rounded-full flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                      </div>
+                    </div>
+                    <motion.div
+                      className="text-4xl font-bold text-white mb-4"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.6, duration: 0.4 }}
+                    >
+                      $1,900
+                    </motion.div>
+                    <motion.button
+                      className="px-6 py-2 bg-transparent hover:bg-red-800/20 text-red-400 rounded-full text-sm font-medium border border-red-400/50 hover:border-red-400 transition-all duration-300"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Create Pool
+                    </motion.button>
                   </div>
-                  <div className="text-blue-400 text-sm">
-                    • Fee optimization active
+                </motion.div>
+
+                {/* Claimable Card */}
+                <motion.div
+                  className="relative bg-gradient-to-br from-gray-700/20 via-black/40 to-red-800/20 backdrop-blur-md border border-gray-600/20 rounded-2xl p-6 overflow-hidden group"
+                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.4 }}
+                >
+                  {/* Gradient overlay effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-400/10 via-transparent to-red-400/10 group-hover:from-gray-400/20 group-hover:to-red-400/20 transition-all duration-500" />
+
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-gray-300 text-sm font-medium">
+                        Claimable
+                      </h3>
+                      <div className="w-4 h-4 border border-gray-400 rounded-full flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                      </div>
+                    </div>
+                    <motion.div
+                      className="text-4xl font-bold text-white mb-4"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.7, duration: 0.4 }}
+                    >
+                      $1,900
+                    </motion.div>
+                    <motion.button
+                      className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Claim All
+                    </motion.button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
 
-        {/* Analytics Tab */}
-        {selectedTab === "analytics" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-              <h3 className="text-2xl font-semibold text-white mb-6">
-                Trading Analytics
-              </h3>
-              <div className="h-64 bg-white/5 rounded-xl flex items-center justify-center">
-                <span className="text-gray-400">
-                  Analytics Chart Placeholder
-                </span>
-              </div>
-            </div>
+          {/* Analytics Tab */}
+          {selectedTab === "analytics" && (
+            <motion.div
+              key="analytics"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <InteractiveChart />
 
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-              <h3 className="text-2xl font-semibold text-white mb-6">
-                AI Performance
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">
-                    Fee Optimization Accuracy
-                  </span>
-                  <span className="text-green-400 font-semibold">94.2%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">LP Returns Improvement</span>
-                  <span className="text-green-400 font-semibold">+18.5%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Trades Processed</span>
-                  <span className="text-white font-semibold">125,847</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+              <AnimatedAIInsights />
+            </motion.div>
+          )}
 
-        {/* Fees Tab */}
-        {selectedTab === "fees" && (
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-            <h3 className="text-2xl font-semibold text-white mb-6">
-              Dynamic Fee Structure
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-2">
-                  0.05%
-                </div>
-                <div className="text-gray-300">Low Volatility</div>
+          {/* Fees Tab */}
+          {selectedTab === "fees" && (
+            <motion.div
+              key="fees"
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              whileHover={{ scale: 1.01 }}
+            >
+              <motion.h3
+                className="text-2xl font-semibold text-white mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+              >
+                Dynamic Fee Structure
+              </motion.h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  {
+                    rate: "0.05%",
+                    label: "Low Volatility",
+                    color: "text-gray-400",
+                    delay: 0.1,
+                  },
+                  {
+                    rate: "0.15%",
+                    label: "Current Rate",
+                    color: "text-yellow-400",
+                    delay: 0.2,
+                  },
+                  {
+                    rate: "0.30%",
+                    label: "High Volatility",
+                    color: "text-red-400",
+                    delay: 0.3,
+                  },
+                ].map((fee, index) => (
+                  <motion.div
+                    key={fee.label}
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + fee.delay, duration: 0.4 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                  >
+                    <motion.div
+                      className={`text-3xl font-bold ${fee.color} mb-2`}
+                      animate={{ scale: index === 1 ? [1, 1.05, 1] : 1 }}
+                      transition={{
+                        duration: 2,
+                        repeat: index === 1 ? Infinity : 0,
+                      }}
+                    >
+                      {fee.rate}
+                    </motion.div>
+                    <div className="text-gray-300">{fee.label}</div>
+                  </motion.div>
+                ))}
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400 mb-2">
-                  0.15%
-                </div>
-                <div className="text-gray-300">Current Rate</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-red-400 mb-2">
-                  0.30%
-                </div>
-                <div className="text-gray-300">High Volatility</div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

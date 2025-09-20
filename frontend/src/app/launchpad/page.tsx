@@ -6,6 +6,7 @@ import { formatEther, parseEther } from "viem";
 import toast from "react-hot-toast";
 import { useLaunchpad, useCreateTokenAndLaunch, useContribute, useLaunchManagement, LaunchFormData } from "@/hooks/useLaunchpad";
 import { LaunchCard } from "@/components/LaunchCard";
+import GlowButton from "@/components/ui/glow-button";
 
 export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");
@@ -168,9 +169,10 @@ export default function LaunchpadPage() {
               </h2>
               <button 
                 onClick={() => setShowCreateForm(true)}
-                className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white px-6 py-2 rounded-full transition-all duration-300"
+              
               >
-                Launch Project
+
+                <GlowButton variant="red"   className=" text-white px-6 py-2 rounded-full transition-all duration-300">Create Launch</GlowButton>
               </button>
             </div>
 

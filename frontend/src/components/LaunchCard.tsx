@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { formatEther } from 'viem';
 import { LaunchDetails } from '@/hooks/useLaunchpad';
 import toast from 'react-hot-toast';
+import GlowButton from './ui/glow-button';
 
 // LaunchCard component for displaying individual launches
 interface LaunchCardProps {
@@ -153,9 +154,11 @@ export function LaunchCard({
             <button 
               onClick={handleContribute}
               disabled={isContributing || !contributionAmount || isDemoMode}
-              className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+              className="w-full  disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
             >
+              <GlowButton variant="red" className="w-full flex justify-center items-center  text-white font-semibold py-2 rounded-xl transition-all duration-300 shadow-lg">
               {isDemoMode ? "Demo Mode" : isContributing ? "Contributing..." : "Contribute"}
+              </GlowButton>
             </button>
           </div>
         )}
