@@ -150,7 +150,6 @@ export default function LaunchpadPage() {
         {/* Projects Tab */}
         {selectedTab === "projects" && (
           <div className="space-y-6">
-            <ContractTest />
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold text-white">
                 Active & Upcoming Projects ({launchCount})
@@ -201,7 +200,7 @@ export default function LaunchpadPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
               {launches.map((launch, index) => {
                 return (
                   <LaunchCard
