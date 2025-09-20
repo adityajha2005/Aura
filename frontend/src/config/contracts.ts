@@ -5,13 +5,13 @@ export const CURRENCY = "AVAX";
 
 // Contract addresses from deployment
 export const CONTRACT_ADDRESSES = {
-  TestTokens: "0x246B2a6C376Df8299C90A717aE4661599F636BDD",
-  AuraGovernanceToken: "0x9947056cC11E283617De19336236Da8f4CcE8BD2", 
-  LPToken: "0xD9E8A86205a881072924981d3e6124183C8C5a27",
-  LiquidityPool: "0x8bCcb416986C47aBb7CD2C2D57135C0f5405A7d3",
-  Governance: "0xb0E19E6795F38a66bf5bbB6fC5F314E16BCbAFE9",
-  Launchpad: "0x105E62d8d558a68587a61610e89BcA5D368A0C9e",
-  MagicLinkEscrow: "0x60dA497b872642B25aff3d202ca162590c2888b2"
+  TestTokens: "0xd3521c22Afb98571875Fe02B90F14e912046420b",
+  AuraGovernanceToken: "0x1E9E4db85169A4F111Cc170Eb27B18B1f69DBa97", 
+  LPToken: "0xC63ef30Cec16f95e73Abc9bc6fd12AC279d18940",
+  LiquidityPool: "0x2C13B5704d2638d18283c985bFc5c4b2B243Ff0C",
+  Governance: "0x244231A91AB6092F186D5C212BAe122968411502",
+  Launchpad: "0x15C86B01ee396EF7754B7508ea3e0093509350E7",
+  MagicLinkEscrow: "0x9522E5D602B272f70c999a033D517F2598321dBF"
 } as const;
 
 // Contract metadata
@@ -64,15 +64,15 @@ export const CONTRACT_METADATA = {
 export const DEPLOYMENT_INFO = {
   deployer: "0x0003613a5FBbdB74c7E5af87AB1D6338453391A3",
   deploymentDate: "2025-09-20",
-  deploymentBlock: 46176037,
+  deploymentBlock: 46177832,
   transactionHashes: {
-    TestTokens: "0xb7d7736dbb0760c848c437e5c219dc52c2cf03ee2643c1237684d033607c3fcb",
-    AuraGovernanceToken: "0x5224f5092065acebbf06b9150636c7dc587e4adebe2e1090a2e1dd3b239440b3",
-    LPToken: "0x3b32675402e62c85ded5741153283cec601c79b7032b992d91b833284b3dd1e8",
-    LiquidityPool: "0x34e7471478b66e9132d43c58566fe8adcfeb078cfad32c4e366ea3421fb66aea",
-    Governance: "0xd6353d09e11986df2faccabf352bdc850087983e8979e2fe356b34247b2eb9c7",
-    Launchpad: "0xe7f3215409fde6b477c6fdf5d7a3791e18ff94c272fc053700c2121c316fa9bf",
-    MagicLinkEscrow: "0x0c7760e29bb5340a5682cc7dfc855b59c70aed7a3bcdcc93f6f9f42342fe2a8b"
+    TestTokens: "0xc824635aadc5f6bc46fe37f150959855e5e121113e3159f23879183800105974",
+    AuraGovernanceToken: "0x2f681e8ef5cf0ed12c71dd5c61df61c4a8abc3393fb45cf3031686f88b6d8582",
+    LPToken: "0xbe276550d2e40a684b119a99ec882ef7fd9c457ce41cd863f4a12fd3e47be406",
+    LiquidityPool: "0xaf70ad461e3d7e98eb975ba832a50c6606a32f10e7f45c9c78fa5abc2e5fe748",
+    Governance: "0x2321611266d8a478f7ccee3ed99991c8a4bd7bece9c9a0fc182603932ff35b51",
+    Launchpad: "0x084c9c5f1b4dd560b42a5a5a41dcca802c7ee13c1c4e013c894d804d77a733c8",
+    MagicLinkEscrow: "0x34810f38cb2f7276c075eb70825ab8498d8dd973dc22c76b12401e41634ea221"
   }
 } as const;
 

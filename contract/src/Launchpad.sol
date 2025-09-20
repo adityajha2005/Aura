@@ -7,12 +7,34 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {LiquidityPool} from "./LiquidityPool.sol";
 import {LPToken} from "./LPToken.sol";
+
+// Simple ERC20 token that can be created by the Launchpad
+contract LaunchToken is ERC20, Ownable {
+    constructor(
+        string memory name,
+        string memory symbol,
+        uint256 totalSupply,
+        address owner
+    ) ERC20(name, symbol) Ownable(owner) {
+        _mint(owner, totalSupply);
+    }
+    
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
+    }
+    
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount);
+    }
+}
 contract Launchpad is Ownable, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
     struct Launch {
         address token;
         address creator;
+        string name;
+        string symbol;
         uint256 totalSupply;
         uint256 pricePerToken;
         uint256 minContribution;
@@ -34,7 +56,7 @@ contract Launchpad is Ownable, ReentrancyGuard {
     uint256 public constant LAUNCH_FEE = 1000;
     uint256 public constant FEE_DENOMINATOR = 10000;
 
-    event LaunchCreated(uint256 indexed launchId, address indexed creator, address indexed token);
+    event LaunchCreated(uint256 indexed launchId, address indexed creator, address indexed token, string name, string symbol);
     event ContributionMade(uint256 indexed launchId, address indexed contributor, uint256 amount);
     event LaunchSuccessful(uint256 indexed launchId, uint256 raisedAmount);
     event LaunchCancelled(uint256 indexed launchId);
@@ -44,6 +66,52 @@ contract Launchpad is Ownable, ReentrancyGuard {
         liquidityPool = _liquidityPool;
     }
 
+    // Main function: Create token and launch in one transaction (pump.fun style)
+    function createTokenAndLaunch(
+        string memory name,
+        string memory symbol,
+        uint256 totalSupply,
+        uint256 pricePerToken,
+        uint256 minContribution,
+        uint256 maxContribution,
+        uint256 duration
+    ) external payable nonReentrant {
+        require(bytes(name).length > 0, "name required");
+        require(bytes(symbol).length > 0, "symbol required");
+        require(totalSupply > 0, "invalid supply");
+        require(pricePerToken > 0, "invalid price");
+        require(minContribution > 0, "invalid min");
+        require(maxContribution >= minContribution, "invalid max");
+        require(duration > 0, "invalid duration");
+        
+        uint256 launchFee = (totalSupply * pricePerToken * LAUNCH_FEE) / FEE_DENOMINATOR;
+        require(msg.value >= launchFee, "insufficient fee");
+        
+        // Create new token with custom name and symbol
+        LaunchToken newToken = new LaunchToken(name, symbol, totalSupply, address(this));
+        
+        launchCount++;
+        launches[launchCount] = Launch({
+            token: address(newToken),
+            creator: msg.sender,
+            name: name,
+            symbol: symbol,
+            totalSupply: totalSupply,
+            pricePerToken: pricePerToken,
+            minContribution: minContribution,
+            maxContribution: maxContribution,
+            startTime: block.timestamp,
+            endTime: block.timestamp + duration,
+            raisedAmount: 0,
+            launched: false,
+            cancelled: false,
+            liquidityPool: address(0)
+        });
+
+        emit LaunchCreated(launchCount, msg.sender, address(newToken), name, symbol);
+    }
+
+    // Legacy function for existing tokens (keep for backward compatibility)
     function createLaunch(
         address token,
         uint256 totalSupply,
@@ -62,10 +130,16 @@ contract Launchpad is Ownable, ReentrancyGuard {
         uint256 launchFee = (totalSupply * pricePerToken * LAUNCH_FEE) / FEE_DENOMINATOR;
         require(msg.value >= launchFee, "insufficient fee");
         
+        // Get token name and symbol for existing token
+        string memory tokenName = ERC20(token).name();
+        string memory tokenSymbol = ERC20(token).symbol();
+        
         launchCount++;
         launches[launchCount] = Launch({
             token: token,
             creator: msg.sender,
+            name: tokenName,
+            symbol: tokenSymbol,
             totalSupply: totalSupply,
             pricePerToken: pricePerToken,
             minContribution: minContribution,
@@ -78,7 +152,7 @@ contract Launchpad is Ownable, ReentrancyGuard {
             liquidityPool: address(0)
         });
 
-        emit LaunchCreated(launchCount, msg.sender, token);
+        emit LaunchCreated(launchCount, msg.sender, token, tokenName, tokenSymbol);
     }
 
     function contribute(uint256 launchId, uint256 amount) external nonReentrant {
@@ -178,6 +252,36 @@ contract Launchpad is Ownable, ReentrancyGuard {
 
     function getLaunchCreator(uint256 launchId) external view returns (address) {
         return launches[launchId].creator;
+    }
+
+    function getLaunchTokenInfo(uint256 launchId) external view returns (string memory name, string memory symbol) {
+        Launch storage launch = launches[launchId];
+        return (launch.name, launch.symbol);
+    }
+
+    function getLaunchDetails(uint256 launchId) external view returns (
+        address token,
+        address creator,
+        string memory name,
+        string memory symbol,
+        uint256 totalSupply,
+        uint256 pricePerToken,
+        uint256 raisedAmount,
+        bool launched,
+        bool cancelled
+    ) {
+        Launch storage launch = launches[launchId];
+        return (
+            launch.token,
+            launch.creator,
+            launch.name,
+            launch.symbol,
+            launch.totalSupply,
+            launch.pricePerToken,
+            launch.raisedAmount,
+            launch.launched,
+            launch.cancelled
+        );
     }
 
     // Simplified liquidity management - removed complex unlock functions to reduce size

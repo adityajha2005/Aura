@@ -49,6 +49,54 @@ contract LaunchpadSimpleTest is Test {
         baseToken.approve(address(launchpad), type(uint256).max);
     }
 
+    function testCreateTokenAndLaunch() public {
+        uint256 totalSupply = 1000000 ether;
+        uint256 pricePerToken = 100; // 100 wei per token
+        uint256 launchFee = (totalSupply * pricePerToken * 1000) / 10000; // 10% fee
+        vm.deal(creator, launchFee);
+        
+        vm.prank(creator);
+        launchpad.createTokenAndLaunch{value: launchFee}(
+            "My Custom Token",
+            "MCT",
+            totalSupply,
+            pricePerToken,
+            10 ether,
+            100 ether,
+            7 days
+        );
+        
+        assertEq(launchpad.launchCount(), 1);
+        
+        // Check token info
+        (string memory name, string memory symbol) = launchpad.getLaunchTokenInfo(1);
+        assertEq(name, "My Custom Token");
+        assertEq(symbol, "MCT");
+        
+        // Check launch details
+        (
+            address token,
+            address launchCreator,
+            string memory tokenName,
+            string memory tokenSymbol,
+            uint256 supply,
+            uint256 price,
+            uint256 raised,
+            bool launched,
+            bool cancelled
+        ) = launchpad.getLaunchDetails(1);
+        
+        assertEq(launchCreator, creator);
+        assertEq(tokenName, "My Custom Token");
+        assertEq(tokenSymbol, "MCT");
+        assertEq(supply, totalSupply);
+        assertEq(price, pricePerToken);
+        assertEq(raised, 0);
+        assertFalse(launched);
+        assertFalse(cancelled);
+        assertTrue(token != address(0));
+    }
+
     function testCreateLaunch() public {
         uint256 launchFee = (1000 ether * 100 * 1000) / 10000;
         vm.deal(creator, launchFee);
@@ -162,5 +210,51 @@ contract LaunchpadSimpleTest is Test {
         launchpad.withdrawFees();
         
         assertGe(baseToken.balanceOf(address(this)), ownerBalanceBefore);
+    }
+
+    function testFullTokenLaunchFlow() public {
+        uint256 totalSupply = 1000000 ether;
+        uint256 pricePerToken = 100;
+        uint256 launchFee = (totalSupply * pricePerToken * 1000) / 10000;
+        vm.deal(creator, launchFee);
+        
+        // 1. Create token and launch
+        vm.prank(creator);
+        launchpad.createTokenAndLaunch{value: launchFee}(
+            "Pump Token",
+            "PUMP",
+            totalSupply,
+            pricePerToken,
+            10 ether,
+            100 ether,
+            7 days
+        );
+        
+        // 2. Contributors buy tokens
+        vm.prank(contributor1);
+        launchpad.contribute(1, 50 ether);
+        
+        vm.prank(contributor2);
+        launchpad.contribute(1, 30 ether);
+        
+        // 3. Wait for launch to end and finalize
+        vm.warp(block.timestamp + 8 days);
+        
+        uint256 creatorBalanceBefore = baseToken.balanceOf(creator);
+        
+        vm.prank(creator);
+        launchpad.finalizeLaunch(1);
+        
+        // 4. Verify results
+        assertTrue(launchpad.isLaunchLaunched(1));
+        
+        // Creator should receive 50% of raised funds (40 ether out of 80 ether raised)
+        uint256 expectedCreatorReceive = 40 ether; // 50% of 80 ether raised
+        assertEq(baseToken.balanceOf(creator), creatorBalanceBefore + expectedCreatorReceive);
+        
+        // Check token info is preserved
+        (string memory name, string memory symbol) = launchpad.getLaunchTokenInfo(1);
+        assertEq(name, "Pump Token");
+        assertEq(symbol, "PUMP");
     }
 }

@@ -200,7 +200,7 @@ contract DeployAvalanche is Script {
         console.log("Deployer voting power:", governanceToken.getVotes(deployer) / 1e18, "AGOV");
     }
     
-    function _verifyDeployment() internal {
+    function _verifyDeployment() internal view {
         console.log("\n[VERIFYING] Checking deployment integrity...");
         
         // Verify governance token

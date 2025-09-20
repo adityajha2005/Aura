@@ -12,7 +12,6 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
     struct Escrow {
         address token;
         address sender;
-        address recipient;
         uint256 amount;
         uint256 expirationTime;
         bool claimed;
@@ -31,7 +30,6 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
     event EscrowCreated(
         uint256 indexed escrowId,
         address indexed sender,
-        address indexed recipient,
         address token,
         uint256 amount,
         uint256 expirationTime,
@@ -61,19 +59,16 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
     /**
      * @dev Create a new escrow with a magic link
      * @param token The token to escrow (address(0) for ETH)
-     * @param recipient The intended recipient address
      * @param amount The amount to escrow
      * @param expirationTime When the escrow expires (0 for default)
      * @param secretHash Hash of the secret that will be used to claim
      */
     function createEscrow(
         address token,
-        address recipient,
         uint256 amount,
         uint256 expirationTime,
         bytes32 secretHash
     ) external payable nonReentrant {
-        require(recipient != address(0), "Invalid recipient");
         require(amount > 0, "Invalid amount");
         require(secretHash != bytes32(0), "Invalid secret hash");
         require(!usedSecrets[secretHash], "Secret already used");
@@ -98,7 +93,6 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
         escrows[escrowCount] = Escrow({
             token: token,
             sender: msg.sender,
-            recipient: recipient,
             amount: amount,
             expirationTime: expirationTime,
             claimed: false,
@@ -108,12 +102,10 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
         
         usedSecrets[secretHash] = true;
         userEscrows[msg.sender].push(escrowCount);
-        userEscrows[recipient].push(escrowCount);
         
         emit EscrowCreated(
             escrowCount,
             msg.sender,
-            recipient,
             token,
             amount,
             expirationTime,
@@ -139,14 +131,14 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
         
         if (escrow.token == address(0)) {
             // ETH transfer
-            (bool success, ) = escrow.recipient.call{value: escrow.amount}("");
+            (bool success, ) = msg.sender.call{value: escrow.amount}("");
             require(success, "ETH transfer failed");
         } else {
             // ERC20 transfer
-            ERC20(escrow.token).safeTransfer(escrow.recipient, escrow.amount);
+            ERC20(escrow.token).safeTransfer(msg.sender, escrow.amount);
         }
         
-        emit EscrowClaimed(escrowId, escrow.recipient, escrow.amount);
+        emit EscrowClaimed(escrowId, msg.sender, escrow.amount);
     }
 
     /**
@@ -207,7 +199,6 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
     function getEscrow(uint256 escrowId) external view returns (
         address token,
         address sender,
-        address recipient,
         uint256 amount,
         uint256 expirationTime,
         bool claimed,
@@ -218,7 +209,6 @@ contract MagicLinkEscrow is Ownable, ReentrancyGuard {
         return (
             escrow.token,
             escrow.sender,
-            escrow.recipient,
             escrow.amount,
             escrow.expirationTime,
             escrow.claimed,

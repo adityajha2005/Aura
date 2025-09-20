@@ -36,18 +36,16 @@ contract MagicLinkEscrowTest is Test {
         vm.prank(sender);
         escrow.createEscrow{value: amount}(
             address(0),
-            recipient,
             amount,
             expirationTime,
             secretHash
         );
         
         assertEq(escrow.escrowCount(), 1);
-        (address tokenAddr, address senderAddr, address recipientAddr, uint256 escrowAmount, uint256 expTime, bool claimed, bool cancelled, bytes32 hash) = escrow.getEscrow(1);
+        (address tokenAddr, address senderAddr, uint256 escrowAmount, uint256 expTime, bool claimed, bool cancelled, bytes32 hash) = escrow.getEscrow(1);
         
         assertEq(tokenAddr, address(0));
         assertEq(senderAddr, sender);
-        assertEq(recipientAddr, recipient);
         assertEq(escrowAmount, amount);
         assertEq(expTime, expirationTime);
         assertEq(claimed, false);
@@ -62,7 +60,6 @@ contract MagicLinkEscrowTest is Test {
         vm.prank(sender);
         escrow.createEscrow(
             address(token),
-            recipient,
             amount,
             expirationTime,
             secretHash
@@ -78,15 +75,11 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            0, // Default expiration
+        escrow.createEscrow{value: amount}(address(0), amount, 0, // Default expiration
             secretHash
         );
         
-        (, , , , uint256 expTime, , , ) = escrow.getEscrow(1);
+        (, , , uint256 expTime, , , ) = escrow.getEscrow(1);
         assertEq(expTime, block.timestamp + 30 days); // DEFAULT_EXPIRATION
     }
 
@@ -95,12 +88,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         uint256 recipientBalanceBefore = recipient.balance;
@@ -109,7 +97,7 @@ contract MagicLinkEscrowTest is Test {
         escrow.claimEscrow(1, secret);
         
         assertEq(recipient.balance, recipientBalanceBefore + amount);
-        (, , , , , bool claimed, , ) = escrow.getEscrow(1);
+        (, , , , bool claimed, , ) = escrow.getEscrow(1);
         assertEq(claimed, true);
     }
 
@@ -117,12 +105,7 @@ contract MagicLinkEscrowTest is Test {
         uint256 amount = 100 ether;
         
         vm.prank(sender);
-        escrow.createEscrow(
-            address(token),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow(address(token), amount, block.timestamp + 7 days, secretHash
         );
         
         uint256 recipientBalanceBefore = token.balanceOf(recipient);
@@ -139,12 +122,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         uint256 senderBalanceBefore = sender.balance;
@@ -153,7 +131,7 @@ contract MagicLinkEscrowTest is Test {
         escrow.cancelEscrow(1);
         
         assertEq(sender.balance, senderBalanceBefore + amount);
-        (, , , , , , bool cancelled, ) = escrow.getEscrow(1);
+        (, , , , , bool cancelled, ) = escrow.getEscrow(1);
         assertEq(cancelled, true);
     }
 
@@ -161,12 +139,7 @@ contract MagicLinkEscrowTest is Test {
         uint256 amount = 100 ether;
         
         vm.prank(sender);
-        escrow.createEscrow(
-            address(token),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow(address(token), amount, block.timestamp + 7 days, secretHash
         );
         
         uint256 senderBalanceBefore = token.balanceOf(sender);
@@ -183,12 +156,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 1 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 1 days, secretHash
         );
         
         vm.warp(block.timestamp + 2 days);
@@ -199,7 +167,7 @@ contract MagicLinkEscrowTest is Test {
         escrow.expireEscrow(1);
         
         assertEq(sender.balance, senderBalanceBefore + amount);
-        (, , , , , , bool cancelled, ) = escrow.getEscrow(1);
+        (, , , , , bool cancelled, ) = escrow.getEscrow(1);
         assertEq(cancelled, true);
     }
 
@@ -207,12 +175,7 @@ contract MagicLinkEscrowTest is Test {
         uint256 amount = 100 ether;
         
         vm.prank(sender);
-        escrow.createEscrow(
-            address(token),
-            recipient,
-            amount,
-            block.timestamp + 1 days,
-            secretHash
+        escrow.createEscrow(address(token), amount, block.timestamp + 1 days, secretHash
         );
         
         vm.warp(block.timestamp + 2 days);
@@ -231,12 +194,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.prank(recipient);
@@ -249,12 +207,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 1 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 1 days, secretHash
         );
         
         vm.warp(block.timestamp + 2 days);
@@ -269,12 +222,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.prank(sender);
@@ -290,12 +238,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.prank(recipient);
@@ -311,12 +254,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.prank(recipient);
@@ -329,12 +267,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.prank(thirdParty);
@@ -347,23 +280,13 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.deal(sender, amount * 2); // Need more ETH for second escrow
         vm.prank(sender);
         vm.expectRevert(bytes("Secret already used"));
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
     }
 
@@ -374,11 +297,11 @@ contract MagicLinkEscrowTest is Test {
         
         // Invalid recipient
         vm.prank(sender);
-        vm.expectRevert(bytes("Invalid recipient"));
+        // Test invalid amount instead since recipient is removed
+        vm.expectRevert(bytes("Invalid amount"));
         escrow.createEscrow{value: amount}(
             address(0),
-            address(0),
-            amount,
+            0, // Invalid amount
             block.timestamp + 7 days,
             secretHash
         );
@@ -386,34 +309,19 @@ contract MagicLinkEscrowTest is Test {
         // Invalid amount
         vm.prank(sender);
         vm.expectRevert(bytes("Invalid amount"));
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            0,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), 0, block.timestamp + 7 days, secretHash
         );
         
         // Invalid secret hash
         vm.prank(sender);
         vm.expectRevert(bytes("Invalid secret hash"));
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            bytes32(0)
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, bytes32(0)
         );
         
         // Expiration too far
         vm.prank(sender);
         vm.expectRevert(bytes("Expiration too far"));
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 400 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 400 days, secretHash
         );
     }
 
@@ -422,12 +330,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         assertTrue(escrow.isClaimable(1));
@@ -441,12 +344,7 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 1 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 1 days, secretHash
         );
         
         assertFalse(escrow.isExpired(1));
@@ -460,21 +358,15 @@ contract MagicLinkEscrowTest is Test {
         
         vm.deal(sender, amount);
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         uint256[] memory senderEscrows = escrow.getUserEscrows(sender);
         uint256[] memory recipientEscrows = escrow.getUserEscrows(recipient);
         
         assertEq(senderEscrows.length, 1);
-        assertEq(recipientEscrows.length, 1);
+        assertEq(recipientEscrows.length, 0); // Recipients are no longer tracked
         assertEq(senderEscrows[0], 1);
-        assertEq(recipientEscrows[0], 1);
     }
 
     function testEmergencyRecover() public {
@@ -519,18 +411,12 @@ contract MagicLinkEscrowTest is Test {
         vm.deal(sender, amount * 2);
         
         vm.prank(sender);
-        escrow.createEscrow{value: amount}(
-            address(0),
-            recipient,
-            amount,
-            block.timestamp + 7 days,
-            secretHash
+        escrow.createEscrow{value: amount}(address(0), amount, block.timestamp + 7 days, secretHash
         );
         
         vm.prank(sender);
         escrow.createEscrow{value: amount}(
             address(0),
-            thirdParty,
             amount,
             block.timestamp + 7 days,
             secretHash2
