@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatEther, parseEther } from "viem";
 import { useLaunchpad, useCreateTokenAndLaunch, useContribute, useLaunchManagement, LaunchFormData } from "@/hooks/useLaunchpad";
-import { CONTRACT_ADDRESSES } from "@/config/contracts";
 import { LaunchCard } from "@/components/LaunchCard";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import { ContractTest } from "@/components/ContractTest";
