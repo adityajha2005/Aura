@@ -12,18 +12,12 @@ export default function GovernanceInterface() {
 
   const {
     proposals,
-    proposalCount,
     userBalance,
-    userVotingPower,
-    votingPowerPercentage,
     loading,
     isPending,
-    isConfirming,
-    isConfirmed,
     vote,
     executeProposal,
     fetchProposals,
-    getProposalStatus,
     hasUserVoted,
     getTimeRemaining,
     getProposalStatusText,
@@ -45,7 +39,7 @@ export default function GovernanceInterface() {
       
       checkVotingStatus();
     }
-  }, [address, proposals]);
+  }, [address, proposals, hasUserVoted]);
 
 
   const handleVote = async (proposalId: number, support: boolean) => {
@@ -183,8 +177,8 @@ export default function GovernanceInterface() {
                 const timeRemaining = getTimeRemaining(proposal.endTime);
                 const hasVoted = userVotedStatus[proposal.id];
                 const totalVotes = proposal.yesVotes + proposal.noVotes;
-                const yesPercentage = totalVotes > 0 ? Number((proposal.yesVotes * 10000n) / totalVotes) / 100 : 0;
-                const noPercentage = totalVotes > 0 ? Number((proposal.noVotes * 10000n) / totalVotes) / 100 : 0;
+                const yesPercentage = totalVotes > 0 ? Number((proposal.yesVotes * BigInt(10000)) / totalVotes) / 100 : 0;
+                const noPercentage = totalVotes > 0 ? Number((proposal.noVotes * BigInt(10000)) / totalVotes) / 100 : 0;
 
                 return (
                   <div

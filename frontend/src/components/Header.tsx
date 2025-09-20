@@ -13,6 +13,7 @@ function Header() {
   const navItems = [
     { name: "Home", path: "/" },
     { name: "AI DEX", path: "/ai-dex" },
+    // { name: "AI Governance", path: "/ai-governance" },
     { name: "Launchpad", path: "/launchpad" },
     { name: "Magic Links", path: "/magic-links" },
     { name: "Governance", path: "/governance" },

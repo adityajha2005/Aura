@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import { useMarketData } from "@/hooks/useAI";
 
 interface ChartData {
   time: string;
@@ -11,17 +12,23 @@ interface ChartData {
   change: number;
 }
 
-const generateMockData = (): ChartData[] => {
+const generateRealisticData = (basePrice: number): ChartData[] => {
   const data: ChartData[] = [];
-  let price = 100;
+  let price = basePrice;
 
   for (let i = 0; i < 24; i++) {
-    const change = (Math.random() - 0.5) * 10;
+    const volatility = 0.02; // 2% volatility per hour
+    const change = (Math.random() - 0.5) * volatility * price;
     price += change;
+
+    // Ensure price stays within reasonable bounds
+    price = Math.max(price, basePrice * 0.8);
+    price = Math.min(price, basePrice * 1.2);
+
     data.push({
       time: `${String(i).padStart(2, "0")}:00`,
-      price: Math.max(price, 80),
-      volume: Math.random() * 1000000,
+      price: price,
+      volume: Math.random() * 1000000 + 500000, // More realistic volume
       change: change,
     });
   }
@@ -29,19 +36,33 @@ const generateMockData = (): ChartData[] => {
 };
 
 export function InteractiveChart() {
-  const [data, setData] = useState<ChartData[]>(generateMockData());
+  const { data: marketData, isLoading: isMarketLoading } = useMarketData({
+    refreshInterval: 30000,
+  });
+
+  const [data, setData] = useState<ChartData[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState("24H");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isLive, setIsLive] = useState(true);
 
+  // Initialize data when market data is available
   useEffect(() => {
-    if (!isLive) return;
+    if (marketData?.price_usd && data.length === 0) {
+      setData(generateRealisticData(marketData.price_usd));
+    }
+  }, [marketData?.price_usd, data.length]);
 
-    const interval = setInterval(() => {
+  // Update data when real market price changes
+  useEffect(() => {
+    if (marketData?.price_usd && data.length > 0) {
       setData((prevData) => {
         const newData = [...prevData];
         const lastPrice = newData[newData.length - 1].price;
-        const change = (Math.random() - 0.5) * 5;
+        const realPrice = marketData.price_usd;
+
+        // Gradually adjust towards real price
+        const adjustment = (realPrice - lastPrice) * 0.1;
+        const newPrice = lastPrice + adjustment;
 
         newData.shift(); // Remove first element
         newData.push({
@@ -50,8 +71,35 @@ export function InteractiveChart() {
             hour: "2-digit",
             minute: "2-digit",
           }),
-          price: Math.max(lastPrice + change, 80),
-          volume: Math.random() * 1000000,
+          price: newPrice,
+          volume: Math.random() * 1000000 + 500000,
+          change: adjustment,
+        });
+
+        return newData;
+      });
+    }
+  }, [marketData?.price_usd, data.length]);
+
+  useEffect(() => {
+    if (!isLive || data.length === 0) return;
+
+    const interval = setInterval(() => {
+      setData((prevData) => {
+        const newData = [...prevData];
+        const lastPrice = newData[newData.length - 1].price;
+        const volatility = marketData?.volatility ? marketData.volatility / 100 : 0.01;
+        const change = (Math.random() - 0.5) * volatility * lastPrice;
+
+        newData.shift(); // Remove first element
+        newData.push({
+          time: new Date().toLocaleTimeString("en-US", {
+            hour12: false,
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          price: Math.max(lastPrice + change, (marketData?.price_usd || 25) * 0.8),
+          volume: Math.random() * 1000000 + 500000,
           change: change,
         });
 
@@ -60,7 +108,24 @@ export function InteractiveChart() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isLive]);
+  }, [isLive, data.length, marketData?.volatility, marketData?.price_usd]);
+
+  if (isMarketLoading || data.length === 0) {
+    return (
+      <motion.div
+        className="relative bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden group"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="animate-pulse">
+          <div className="h-6 bg-white/10 rounded mb-4"></div>
+          <div className="h-8 bg-white/5 rounded mb-2"></div>
+          <div className="h-48 bg-white/5 rounded"></div>
+        </div>
+      </motion.div>
+    );
+  }
 
   const maxPrice = Math.max(...data.map((d) => d.price));
   const minPrice = Math.min(...data.map((d) => d.price));
@@ -89,7 +154,7 @@ export function InteractiveChart() {
           </h3>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-2xl font-bold text-white">
-              ${latestData.price.toFixed(2)}
+              ${marketData?.price_usd?.toFixed(2) || latestData.price.toFixed(2)}
             </span>
             <motion.span
               className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded-full ${
@@ -107,6 +172,19 @@ export function InteractiveChart() {
               )}
               {priceChangePercent.toFixed(2)}%
             </motion.span>
+            <motion.div
+              className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 0.3 }}
+            >
+              <motion.div
+                className="w-1.5 h-1.5 bg-emerald-400 rounded-full"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
+              Live Data
+            </motion.div>
           </div>
         </div>
 
@@ -338,8 +416,14 @@ export function InteractiveChart() {
         >
           <div className="text-xs text-gray-400 mb-1">24h Volume</div>
           <div className="text-sm font-semibold text-white">
-            ${(data.reduce((sum, d) => sum + d.volume, 0) / 1000000).toFixed(1)}
-            M
+            {marketData?.volume_24h
+              ? marketData.volume_24h >= 1e9
+                ? `$${(marketData.volume_24h / 1e9).toFixed(2)}B`
+                : marketData.volume_24h >= 1e6
+                ? `$${(marketData.volume_24h / 1e6).toFixed(2)}M`
+                : `$${(marketData.volume_24h / 1000).toFixed(0)}K`
+              : `$${(data.reduce((sum, d) => sum + d.volume, 0) / 1000000).toFixed(1)}M`
+            }
           </div>
         </motion.div>
       </div>

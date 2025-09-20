@@ -2,7 +2,7 @@ import NOSCommitmentSection from "@/components/Commitement";
 import PhoneComponent from "@/components/phone-component";
 import GlowButton from "@/components/ui/glow-button";
 import Why from "@/components/Why";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (

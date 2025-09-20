@@ -256,7 +256,7 @@ class AuraAIClient {
 
   // Format fee for display
   formatFee(fee: number): string {
-    return `${(fee * 100).toFixed(3)}%`;
+    return `${fee.toFixed(3)}%`;
   }
 
   // Format confidence for display

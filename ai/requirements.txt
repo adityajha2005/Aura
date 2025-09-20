@@ -4,7 +4,13 @@ requests
 aiohttp
 numpy
 scikit-learn
+tensorflow>=2.13.0
 pydantic
 python-dotenv
 web3
 pythclient
+
+# Additional dependencies for enhanced CoinGecko integration
+pandas>=1.5.0
+asyncio-throttle
+cachetools

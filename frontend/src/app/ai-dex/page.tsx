@@ -6,7 +6,6 @@ import Image from "next/image";
 import { InteractiveChart } from "../../components/InteractiveChart";
 import AIFeeRecommendation from "@/components/AIFeeRecommendation";
 import AIMarketInsights from "@/components/AIMarketInsights";
-import AIGovernanceIntegration from "@/components/AIGovernanceIntegration";
 
 import GlowButton from "@/components/ui/glow-button";
 
@@ -507,7 +506,6 @@ export default function AIDexPage() {
               transition={{ duration: 0.3 }}
             >
               <InteractiveChart />
-
               <AIMarketInsights />
             </motion.div>
           )}
@@ -578,25 +576,27 @@ export default function AIDexPage() {
                     </motion.div>
                   ))}
                 </div>
-                <div className="text-gray-300">Low Volatility</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400 mb-2">
-                  0.15%
-                </div>
-                <div className="text-gray-300">Current Rate</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-red-400 mb-2">
-                  0.30%
-                </div>
-                <div className="text-gray-300">High Volatility</div>
-              </div>
-            </div>
-          </div>
-        )}
+              </motion.div>
 
-      </div>
+              {/* AI Fee Recommendation */}
+              <motion.div
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+                whileHover={{ scale: 1.01 }}
+              >
+                <motion.h3
+                  className="text-2xl font-semibold text-white mb-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                >
+                  AI Fee Recommendation
+                </motion.h3>
+                <AIFeeRecommendation showDetails={true} />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

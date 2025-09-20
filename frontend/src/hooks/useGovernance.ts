@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { formatEther } from "viem";
 import { CONTRACT_ADDRESSES } from "@/config/contracts";
@@ -43,12 +43,6 @@ export function useGovernance() {
     functionName: "proposalCount",
   });
 
-  const { data: votingPeriod } = useReadContract({
-    address: CONTRACT_ADDRESSES.Governance,
-    abi: GovernanceABI,
-    functionName: "VOTING_PERIOD",
-  });
-
   // Get user's governance token balance
   const { data: userBalance } = useReadContract({
     address: CONTRACT_ADDRESSES.AuraGovernanceToken,
@@ -70,7 +64,7 @@ export function useGovernance() {
   const [loading, setLoading] = useState(false);
 
   // Fetch all proposals
-  const fetchProposals = async () => {
+  const fetchProposals = useCallback(async () => {
     if (!proposalCount) return;
     
     setLoading(true);
@@ -83,7 +77,7 @@ export function useGovernance() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [proposalCount]);
 
   // Get proposal status
   const getProposalStatus = async (proposalId: number): Promise<ProposalStatus | null> => {
@@ -109,12 +103,13 @@ export function useGovernance() {
   // Vote on a proposal
   const vote = async (proposalId: number, support: boolean) => {
     try {
+      // @ts-expect-error - Wagmi/Viem version compatibility issue
       await writeContract({
         address: CONTRACT_ADDRESSES.Governance,
         abi: GovernanceABI,
         functionName: "vote",
-        args: [BigInt(proposalId.toString()), support],
-      } as any);
+        args: [BigInt(proposalId), support],
+      });
     } catch (error) {
       console.error("Error voting:", error);
       throw error;
@@ -124,12 +119,13 @@ export function useGovernance() {
   // Execute a proposal
   const executeProposal = async (proposalId: number) => {
     try {
+      // @ts-expect-error - Wagmi/Viem version compatibility issue
       await writeContract({
         address: CONTRACT_ADDRESSES.Governance,
         abi: GovernanceABI,
         functionName: "executeProposal",
-        args: [BigInt(proposalId.toString())],
-      } as any);
+        args: [BigInt(proposalId)],
+      });
     } catch (error) {
       console.error("Error executing proposal:", error);
       throw error;
@@ -189,7 +185,7 @@ export function useGovernance() {
     if (proposalCount) {
       fetchProposals();
     }
-  }, [proposalCount]);
+  }, [proposalCount, fetchProposals]);
 
   return {
     // State

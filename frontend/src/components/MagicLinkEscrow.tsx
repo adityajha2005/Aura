@@ -451,7 +451,7 @@ export default function MagicLinkEscrow() {
     if (!formData.secret) {
       setFormData((prev) => ({ ...prev, secret: generateSecret() }));
     }
-  }, []); // Empty dependency array - only run once on mount
+  }, [formData.secret, generateSecret]);
 
   // Check for URL parameters to auto-fill claim form
   useEffect(() => {
@@ -493,7 +493,7 @@ export default function MagicLinkEscrow() {
       }
       refetch();
     }
-  }, [isCreateSuccess, escrowCount, refetch]);
+  }, [isCreateSuccess, escrowCount, refetch, formData.secret, formData.recipientEmail]);
 
   // Refetch on other successful operations
   useEffect(() => {

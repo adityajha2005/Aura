@@ -100,13 +100,6 @@ export function AIFeeRecommendation({
     return null;
   }
 
-  const confidenceColor =
-    feeRec.confidence > 0.8
-      ? "text-green-400"
-      : feeRec.confidence > 0.6
-      ? "text-yellow-400"
-      : "text-orange-400";
-
   const modelBadgeColor =
     feeRec.primary_model === "neural_network"
       ? "bg-purple-500/20 text-purple-300"
@@ -142,9 +135,9 @@ export function AIFeeRecommendation({
               {feeRec.primary_model?.replace("_", " ").toUpperCase() || "AI"}
             </span>
           )}
-          <span className={`text-xs ${confidenceColor}`}>
+          {/* <span className={`text-xs ${confidenceColor}`}>
             {formatConfidence(feeRec.confidence)}
-          </span>
+          </span> */}
         </div>
       </div>
 
@@ -233,10 +226,10 @@ export function AIFeeRecommendation({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 0.3 }}
       >
-        <span>
+        {/* <span>
           Updated: {new Date(feeRec.prediction_timestamp).toLocaleTimeString()}
-        </span>
-        <motion.button
+        </span> */}
+        {/* <motion.button
           onClick={() => refetch()}
           className="text-blue-400 hover:text-blue-300 transition-colors"
           whileHover={{ scale: 1.1 }}
@@ -244,7 +237,7 @@ export function AIFeeRecommendation({
           title="Refresh recommendation"
         >
           🔄
-        </motion.button>
+        </motion.button> */}
       </motion.div>
     </motion.div>
   );

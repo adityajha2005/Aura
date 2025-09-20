@@ -14,7 +14,11 @@ from pydantic import BaseModel, Field
 import json
 
 from config import Config
-from data_pipeline import get_live_market_data, get_avax_price, get_volatility
+from data_pipeline import (
+    get_live_market_data, get_avax_price, get_volatility,
+    get_enhanced_coingecko_data, get_multi_coin_data, 
+    get_global_market_data, get_market_sentiment, get_cross_asset_analysis
+)
 from production_models import get_production_fee_recommendation, get_model_info, train_production_models
 from contract_scanner import scan_contract_address, quick_risk_assessment
 
@@ -70,11 +74,160 @@ class MarketDataResponse(BaseModel):
     market_condition: str
     timestamp: str
 
+class EnhancedMarketDataResponse(BaseModel):
+    coingecko: Optional[Dict]
+    coingecko_global: Optional[Dict] 
+    multi_coins: Optional[Dict]
+    pyth: Optional[Dict]
+    network: Optional[Dict]
+    market_indicators: Optional[Dict]
+    cross_asset_analysis: Optional[Dict]
+    market_regime: str
+    timestamp: str
+
+class CrossAssetAnalysisResponse(BaseModel):
+    correlations: Dict
+    market_leadership: str
+    relative_strength: Dict
+    timestamp: str
+
+class GlobalMarketResponse(BaseModel):
+    total_market_cap_usd: float
+    total_volume_24h_usd: float
+    market_cap_percentage: Dict
+    market_cap_change_24h: float
+    active_cryptocurrencies: int
+    market_sentiment: str
+    timestamp: str
+
 class HealthResponse(BaseModel):
     status: str
     timestamp: str
     version: str
     services: Dict[str, str]
+
+# Enhanced market data endpoints
+@app.get("/market-data/enhanced", response_model=EnhancedMarketDataResponse)
+async def get_enhanced_market_data():
+    """Get comprehensive enhanced market data with CoinGecko integration"""
+    try:
+        market_data = await get_live_market_data()
+        return EnhancedMarketDataResponse(**market_data)
+    except Exception as e:
+        logger.error(f"Error fetching enhanced market data: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch enhanced market data: {str(e)}")
+
+@app.get("/market-data/global", response_model=GlobalMarketResponse) 
+async def get_global_market_stats():
+    """Get global cryptocurrency market statistics"""
+    try:
+        global_data = await get_global_market_data()
+        if not global_data:
+            raise HTTPException(status_code=404, detail="Global market data not available")
+        
+        return GlobalMarketResponse(**global_data)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching global market data: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch global market data: {str(e)}")
+
+@app.get("/market-data/multi-coin")
+async def get_multi_coin_analysis(
+    coins: str = Query("avalanche-2,bitcoin,ethereum", description="Comma-separated coin IDs")
+):
+    """Get multi-coin analysis and correlations"""
+    try:
+        coin_ids = [coin.strip() for coin in coins.split(",")]
+        multi_coin_data = await get_multi_coin_data(coin_ids)
+        
+        if not multi_coin_data:
+            raise HTTPException(status_code=404, detail="Multi-coin data not available")
+        
+        return {
+            "coins": multi_coin_data,
+            "timestamp": datetime.now().isoformat()
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching multi-coin data: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch multi-coin data: {str(e)}")
+
+@app.get("/market-data/cross-asset", response_model=CrossAssetAnalysisResponse)
+async def get_cross_asset_correlations():
+    """Get cross-asset correlation analysis"""
+    try:
+        analysis = await get_cross_asset_analysis()
+        if not analysis:
+            raise HTTPException(status_code=404, detail="Cross-asset analysis not available")
+        
+        return CrossAssetAnalysisResponse(
+            **analysis,
+            timestamp=datetime.now().isoformat()
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching cross-asset analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch cross-asset analysis: {str(e)}")
+
+@app.get("/market-data/sentiment")
+async def get_market_sentiment_analysis():
+    """Get overall market sentiment analysis"""
+    try:
+        sentiment = await get_market_sentiment()
+        global_data = await get_global_market_data()
+        enhanced_data = await get_enhanced_coingecko_data()
+        
+        sentiment_data = {
+            "overall_sentiment": sentiment,
+            "avax_sentiment": "neutral",
+            "confidence": 0.7,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # Enhanced sentiment analysis
+        if enhanced_data:
+            rsi = enhanced_data.get("rsi_14", 50)
+            volatility = enhanced_data.get("volatility", 0)
+            
+            if rsi > 70:
+                sentiment_data["avax_sentiment"] = "bullish_extreme"
+            elif rsi > 60:
+                sentiment_data["avax_sentiment"] = "bullish"
+            elif rsi < 30:
+                sentiment_data["avax_sentiment"] = "bearish_extreme"
+            elif rsi < 40:
+                sentiment_data["avax_sentiment"] = "bearish"
+            
+            sentiment_data["volatility_adjusted"] = volatility > 8
+            sentiment_data["rsi"] = rsi
+        
+        if global_data:
+            sentiment_data["btc_dominance"] = global_data.get("market_cap_percentage", {}).get("btc", 0)
+            sentiment_data["market_cap_change_24h"] = global_data.get("market_cap_change_24h", 0)
+        
+        return sentiment_data
+        
+    except Exception as e:
+        logger.error(f"Error fetching sentiment analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch sentiment analysis: {str(e)}")
+
+@app.get("/coin/{coin_id}")
+async def get_specific_coin_data(coin_id: str):
+    """Get detailed data for a specific coin"""
+    try:
+        coin_data = await get_enhanced_coingecko_data(coin_id)
+        if not coin_data:
+            raise HTTPException(status_code=404, detail=f"Data for coin '{coin_id}' not available")
+        
+        return coin_data
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching data for coin {coin_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch coin data: {str(e)}")
 
 # Global state for caching
 market_data_cache = {}
@@ -330,27 +483,56 @@ async def root():
     """Root endpoint with API information"""
     return {
         "name": "Aura AI Backend",
-        "version": "2.0.0",
-        "description": "Production AI-powered backend for Aura Protocol with ML models",
+        "version": "2.1.0",
+        "description": "Enhanced AI-powered backend for Aura Protocol with comprehensive CoinGecko integration",
         "ml_features": {
             "production_models": ["Random Forest", "Gradient Boosting", "Neural Network"],
             "ensemble_prediction": True,
             "real_time_training": True,
-            "confidence_scoring": True
+            "confidence_scoring": True,
+            "technical_analysis": True
+        },
+        "coingecko_features": {
+            "comprehensive_data": True,
+            "multi_coin_analysis": True,
+            "global_market_data": True,
+            "cross_asset_correlations": True,
+            "technical_indicators": ["RSI", "Price Volatility", "Volume Analysis"],
+            "market_regime_detection": True,
+            "sentiment_analysis": True
         },
         "endpoints": {
+            # Core endpoints
             "health": "/health",
             "market_data": "/market-data",
             "volatility": "/volatility",
+            
+            # Enhanced CoinGecko endpoints
+            "enhanced_market_data": "/market-data/enhanced",
+            "global_market_data": "/market-data/global", 
+            "multi_coin_analysis": "/market-data/multi-coin",
+            "cross_asset_analysis": "/market-data/cross-asset",
+            "sentiment_analysis": "/market-data/sentiment",
+            "specific_coin": "/coin/{coin_id}",
+            
+            # AI endpoints
             "recommend_fee": "/recommend-fee",
             "recommend_fee_production": "/recommend-fee/production",
             "model_info": "/model-info",
             "retrain_models": "/retrain-models",
             "market_analysis": "/market-analysis",
+            
+            # Contract scanning
             "scan_contract": "/scan-contract",
             "quick_risk": "/quick-risk/{address}",
+            
+            # Documentation
             "docs": "/docs"
         },
+        "supported_coins": [
+            "avalanche-2", "bitcoin", "ethereum", "solana", "cardano", 
+            "polkadot", "chainlink", "polygon-pos", "litecoin", "uniswap"
+        ],
         "timestamp": datetime.now().isoformat()
     }
 

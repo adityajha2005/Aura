@@ -7,10 +7,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
 import {
   aiClient,
-  FeeRecommendation,
-  MarketData,
-  ContractScanResult,
-  HealthStatus,
 } from "@/lib/ai-api";
 
 // Query keys for React Query

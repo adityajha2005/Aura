@@ -272,9 +272,9 @@ export function AnimatedAIInsights() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.3 }}
         >
-          <span className="text-gray-500 text-xs">
+          {/* <span className="text-gray-500 text-xs">
             Last updated: {new Date().toLocaleTimeString()}
-          </span>
+          </span> */}
         </motion.div>
       </div>
     </motion.div>
