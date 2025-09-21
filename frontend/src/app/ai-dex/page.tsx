@@ -6,6 +6,7 @@ import Image from "next/image";
 import { InteractiveChart } from "../../components/InteractiveChart";
 import AIFeeRecommendation from "@/components/AIFeeRecommendation";
 import AIMarketInsights from "@/components/AIMarketInsights";
+import Tooltip from "@/components/ui/tooltip";
 
 import GlowButton from "@/components/ui/glow-button";
 
@@ -371,39 +372,43 @@ export default function AIDexPage() {
                       $19,600
                     </motion.div>
                     <div className="flex gap-3">
-                      <motion.button
-                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden group"
-                        whileHover={{
-                          scale: 1.05,
-                          boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {/* Button shimmer effect */}
-                        <motion.div
-                          className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
-                          whileHover={{ translateX: "200%" }}
-                          transition={{ duration: 0.6 }}
-                        />
-                        <span className="relative z-10">Stake</span>
-                      </motion.button>
-                      <motion.button
-                        className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300 relative overflow-hidden group"
-                        whileHover={{
-                          scale: 1.05,
-                          borderColor: "rgba(255, 255, 255, 0.4)",
-                          boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {/* Button glow effect */}
-                        <motion.div
-                          className="absolute inset-0 bg-white/5 opacity-0"
-                          whileHover={{ opacity: 1 }}
-                          transition={{ duration: 0.3 }}
-                        />
-                        <span className="relative z-10">Unstake</span>
-                      </motion.button>
+                      <Tooltip text="Coming Soon" position="top">
+                        <motion.button
+                          className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden group"
+                          whileHover={{
+                            scale: 1.05,
+                            boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)",
+                          }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {/* Button shimmer effect */}
+                          <motion.div
+                            className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                            whileHover={{ translateX: "200%" }}
+                            transition={{ duration: 0.6 }}
+                          />
+                          <span className="relative z-10">Stake</span>
+                        </motion.button>
+                      </Tooltip>
+                      <Tooltip text="Coming Soon" position="top">
+                        <motion.button
+                          className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300 relative overflow-hidden group"
+                          whileHover={{
+                            scale: 1.05,
+                            borderColor: "rgba(255, 255, 255, 0.4)",
+                            boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)",
+                          }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {/* Button glow effect */}
+                          <motion.div
+                            className="absolute inset-0 bg-white/5 opacity-0"
+                            whileHover={{ opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                          <span className="relative z-10">Unstake</span>
+                        </motion.button>
+                      </Tooltip>
                     </div>
                   </div>
                 </motion.div>
@@ -440,13 +445,15 @@ export default function AIDexPage() {
                     >
                       $1,900
                     </motion.div>
-                    <motion.button
-                      className="px-6 py-2 bg-transparent hover:bg-white/10 text-white rounded-full text-sm font-medium border border-white/30 hover:border-white/50 transition-all duration-300"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Create Pool
-                    </motion.button>
+                    <Tooltip text="Coming Soon" position="top">
+                      <motion.button
+                        className="px-6 py-2 bg-transparent hover:bg-white/10 text-white rounded-full text-sm font-medium border border-white/30 hover:border-white/50 transition-all duration-300"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Create Pool
+                      </motion.button>
+                    </Tooltip>
                   </div>
                 </motion.div>
 
@@ -482,13 +489,15 @@ export default function AIDexPage() {
                     >
                       $1,900
                     </motion.div>
-                    <motion.button
-                      className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Claim All
-                    </motion.button>
+                    <Tooltip text="Coming Soon" position="top">
+                      <motion.button
+                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium border border-white/20 transition-all duration-300"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Claim All
+                      </motion.button>
+                    </Tooltip>
                   </div>
                 </motion.div>
               </motion.div>

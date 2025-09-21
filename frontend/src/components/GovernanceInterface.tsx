@@ -7,18 +7,16 @@ import { motion, useInView } from "motion/react";
 import toast from "react-hot-toast";
 import ProposalCreationForm from "./ProposalCreationForm";
 import ProposalsList from "./ProposalsList";
-import ContractTest from "./ContractTest";
 import DelegationHelper from "./DelegationHelper";
 
 export default function GovernanceInterface() {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Animation refs
   const heroRef = useRef(null);
   const statsRef = useRef(null);
   const mainContentRef = useRef(null);
-  const sidebarRef = useRef(null);
 
   // Viewport detection
   const heroInView = useInView(heroRef, {
@@ -30,10 +28,6 @@ export default function GovernanceInterface() {
     margin: "0px 0px -50px 0px",
   });
   const mainContentInView = useInView(mainContentRef, {
-    once: true,
-    margin: "0px 0px -50px 0px",
-  });
-  const sidebarInView = useInView(sidebarRef, {
     once: true,
     margin: "0px 0px -50px 0px",
   });
@@ -98,7 +92,8 @@ export default function GovernanceInterface() {
     setShowCreateForm(false);
   };
 
-  if (!isConnected) {
+  // Use address existence instead of isConnected for more reliable detection
+  if (!address) {
     return (
       <div className="min-h-screen relative overflow-hidden pt-20">
         <div className="relative z-20 max-w-7xl mx-auto px-4 py-8">
@@ -243,12 +238,12 @@ export default function GovernanceInterface() {
           ))}
         </motion.div>
 
-        {/* Main Content Layout: 3/4 Left + 1/4 Right */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Section (3/4 width) - Main Content */}
+        {/* Main Content Layout - Full Width */}
+        <div className="w-full">
+          {/* Main Content Section */}
           <motion.div
             ref={mainContentRef}
-            className="w-full lg:w-3/4"
+            className="w-full"
             initial={{ opacity: 0, x: -30, filter: "blur(10px)" }}
             animate={
               mainContentInView
@@ -257,8 +252,9 @@ export default function GovernanceInterface() {
             }
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
-            {/* Contract Test - Temporary for debugging */}
+            {/* Delegation Helper */}
             <motion.div
+              className="mb-8"
               initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
               animate={
                 mainContentInView
@@ -266,19 +262,6 @@ export default function GovernanceInterface() {
                   : { opacity: 0, y: 20, filter: "blur(10px)" }
               }
               transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            >
-              <ContractTest />
-            </motion.div>
-
-            {/* Delegation Helper */}
-            <motion.div
-              initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-              animate={
-                mainContentInView
-                  ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                  : { opacity: 0, y: 20, filter: "blur(10px)" }
-              }
-              transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
             >
               <DelegationHelper onDelegationComplete={() => {}} />
             </motion.div>
@@ -292,7 +275,7 @@ export default function GovernanceInterface() {
                   ? { opacity: 1, y: 0, filter: "blur(0px)" }
                   : { opacity: 0, y: 20, filter: "blur(10px)" }
               }
-              transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
             >
               <button
                 onClick={() => setShowCreateForm(true)}
@@ -321,87 +304,29 @@ export default function GovernanceInterface() {
               </p>
             </motion.div>
 
-            {/* Full proposals list for mobile */}
+            {/* Full-width Proposals Section */}
             <motion.div
-              className="block lg:hidden"
               initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
               animate={
                 mainContentInView
                   ? { opacity: 1, y: 0, filter: "blur(0px)" }
                   : { opacity: 0, y: 20, filter: "blur(10px)" }
               }
-              transition={{ duration: 0.6, delay: 0.7, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
             >
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+                <h3 className="text-2xl font-semibold text-white mb-6 text-center">
                   Active Proposals
                 </h3>
-                <ProposalsList
-                  onVote={handleVote}
-                  onExecute={handleExecuteProposal}
-                  isPending={isPending}
-                  compact={false}
-                />
+                <div className="min-h-[600px]">
+                  <ProposalsList
+                    onVote={handleVote}
+                    onExecute={handleExecuteProposal}
+                    isPending={isPending}
+                    compact={false}
+                  />
+                </div>
               </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Right Section (1/4 width) - Voting Section - Desktop Only */}
-          <motion.div
-            ref={sidebarRef}
-            className="hidden lg:block w-1/4"
-            initial={{ opacity: 0, x: 30, filter: "blur(10px)" }}
-            animate={
-              sidebarInView
-                ? { opacity: 1, x: 0, filter: "blur(0px)" }
-                : { opacity: 0, x: 30, filter: "blur(10px)" }
-            }
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          >
-            <motion.div
-              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 sticky top-8"
-              initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-              animate={
-                sidebarInView
-                  ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                  : { opacity: 0, y: 20, filter: "blur(10px)" }
-              }
-              transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-            >
-              <motion.h3
-                className="text-xl font-semibold text-white mb-4 text-center"
-                initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
-                animate={
-                  sidebarInView
-                    ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                    : { opacity: 0, y: 10, filter: "blur(5px)" }
-                }
-                transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
-              >
-                Active Proposals
-              </motion.h3>
-              <motion.div
-                className="max-h-[600px] overflow-y-auto pr-2"
-                style={{
-                  scrollbarWidth: "thin",
-                  scrollbarColor:
-                    "rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.1)",
-                }}
-                initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
-                animate={
-                  sidebarInView
-                    ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                    : { opacity: 0, y: 10, filter: "blur(5px)" }
-                }
-                transition={{ duration: 0.5, delay: 0.7, ease: "easeOut" }}
-              >
-                <ProposalsList
-                  onVote={handleVote}
-                  onExecute={handleExecuteProposal}
-                  isPending={isPending}
-                  compact={true}
-                />
-              </motion.div>
             </motion.div>
           </motion.div>
         </div>

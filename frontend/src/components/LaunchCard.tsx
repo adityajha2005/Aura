@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { formatEther } from 'viem';
-import { LaunchDetails } from '@/hooks/useLaunchpad';
-import toast from 'react-hot-toast';
-import GlowButton from './ui/glow-button';
+import { useState } from "react";
+import { formatEther } from "viem";
+import { LaunchDetails } from "@/hooks/useLaunchpad";
+import toast from "react-hot-toast";
+import GlowButton from "./ui/glow-button";
 
 // LaunchCard component for displaying individual launches
 interface LaunchCardProps {
@@ -28,7 +28,7 @@ export function LaunchCard({
   userAddress,
   isDemoMode = false,
 }: LaunchCardProps) {
-  const [contributionAmount, setContributionAmount] = useState('');
+  const [contributionAmount, setContributionAmount] = useState("");
   const [showDetails, setShowDetails] = useState(false);
 
   const getLaunchStatus = () => {
@@ -40,7 +40,8 @@ export function LaunchCard({
   };
 
   const getProgressPercentage = () => {
-    const totalValue = Number(launch.totalSupply) * Number(launch.pricePerToken);
+    const totalValue =
+      Number(launch.totalSupply) * Number(launch.pricePerToken);
     const raisedValue = Number(launch.raisedAmount);
     return totalValue > 0 ? (raisedValue / totalValue) * 100 : 0;
   };
@@ -53,7 +54,7 @@ export function LaunchCard({
   const handleContribute = () => {
     if (contributionAmount) {
       onContribute(launchId, contributionAmount);
-      setContributionAmount('');
+      setContributionAmount("");
     }
   };
 
@@ -70,9 +71,7 @@ export function LaunchCard({
     <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 w-full max-w-sm mx-auto">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-semibold text-white">
-            {launch.name}
-          </h3>
+          <h3 className="text-xl font-semibold text-white">{launch.name}</h3>
           <p className="text-gray-400 text-sm">{launch.symbol}</p>
         </div>
         <span
@@ -97,12 +96,13 @@ export function LaunchCard({
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-300">Progress</span>
             <span className="text-white">
-              {formatEther(launch.raisedAmount)} / {formatEther(BigInt(totalValue.toString()))} AVAX
+              {formatEther(launch.raisedAmount)} /{" "}
+              {formatEther(BigInt(totalValue.toString()))} AVAX
             </span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-red-500 to-purple-500 h-2 rounded-full"
+              className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full"
               style={{ width: `${Math.min(progress, 100)}%` }}
             ></div>
           </div>
@@ -151,13 +151,20 @@ export function LaunchCard({
               disabled={isDemoMode}
               className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder-gray-400 outline-none focus:border-white/30 text-sm disabled:opacity-50"
             />
-            <button 
+            <button
               onClick={handleContribute}
               disabled={isContributing || !contributionAmount || isDemoMode}
               className="w-full  disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
             >
-              <GlowButton variant="red" className="w-full flex justify-center items-center  text-white font-semibold py-2 rounded-xl transition-all duration-300 shadow-lg">
-              {isDemoMode ? "Demo Mode" : isContributing ? "Contributing..." : "Contribute"}
+              <GlowButton
+                variant="red"
+                className="w-full flex justify-center items-center  text-white font-semibold py-2 rounded-xl transition-all duration-300 shadow-lg"
+              >
+                {isDemoMode
+                  ? "Demo Mode"
+                  : isContributing
+                  ? "Contributing..."
+                  : "Contribute"}
               </GlowButton>
             </button>
           </div>
@@ -165,24 +172,32 @@ export function LaunchCard({
 
         {status === "Active" && isCreator && (
           <div className="space-y-2">
-            <button 
+            <button
               onClick={() => onFinalize(launchId)}
               disabled={isManaging || isDemoMode}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
             >
-              {isDemoMode ? "Demo Mode" : isManaging ? "Processing..." : "Finalize Launch"}
+              {isDemoMode
+                ? "Demo Mode"
+                : isManaging
+                ? "Processing..."
+                : "Finalize Launch"}
             </button>
-            <button 
+            <button
               onClick={() => onCancel(launchId)}
               disabled={isManaging || isDemoMode}
-              className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
+              className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 disabled:opacity-50 text-white py-2 rounded-xl transition-all duration-300"
             >
-              {isDemoMode ? "Demo Mode" : isManaging ? "Processing..." : "Cancel Launch"}
+              {isDemoMode
+                ? "Demo Mode"
+                : isManaging
+                ? "Processing..."
+                : "Cancel Launch"}
             </button>
           </div>
         )}
 
-        <button 
+        <button
           onClick={() => setShowDetails(!showDetails)}
           className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-2 rounded-xl transition-all duration-300"
         >
@@ -198,7 +213,7 @@ export function LaunchCard({
                   {truncateAddress(launch.token)}
                 </span>
                 <button
-                  onClick={() => copyToClipboard(launch.token, 'Token address')}
+                  onClick={() => copyToClipboard(launch.token, "Token address")}
                   className="text-gray-400 hover:text-white transition-colors text-xs px-2 py-1 rounded hover:bg-white/10"
                   title="Copy full address"
                 >
@@ -213,7 +228,9 @@ export function LaunchCard({
                   {truncateAddress(launch.creator)}
                 </span>
                 <button
-                  onClick={() => copyToClipboard(launch.creator, 'Creator address')}
+                  onClick={() =>
+                    copyToClipboard(launch.creator, "Creator address")
+                  }
                   className="text-gray-400 hover:text-white transition-colors text-xs px-2 py-1 rounded hover:bg-white/10"
                   title="Copy full address"
                 >
@@ -228,7 +245,12 @@ export function LaunchCard({
                   {truncateAddress(launch.liquidityPool)}
                 </span>
                 <button
-                  onClick={() => copyToClipboard(launch.liquidityPool, 'Liquidity pool address')}
+                  onClick={() =>
+                    copyToClipboard(
+                      launch.liquidityPool,
+                      "Liquidity pool address"
+                    )
+                  }
                   className="text-gray-400 hover:text-white transition-colors text-xs px-2 py-1 rounded hover:bg-white/10"
                   title="Copy full address"
                 >
