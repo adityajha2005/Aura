@@ -5,41 +5,25 @@ import { useAccount } from "wagmi";
 import { useGovernance } from "@/hooks/useGovernance";
 import { formatEther } from "viem";
 import toast from "react-hot-toast";
+import ProposalCreationForm from "./ProposalCreationForm";
+import ProposalsList from "./ProposalsList";
+import ContractTest from "./ContractTest";
+import DelegationHelper from "./DelegationHelper";
 
 export default function GovernanceInterface() {
   const { address, isConnected } = useAccount();
-  const [userVotedStatus, setUserVotedStatus] = useState<Record<number, boolean>>({});
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const {
     proposals,
     userBalance,
+    userVotingPower,
     loading,
     isPending,
     vote,
     executeProposal,
     fetchProposals,
-    hasUserVoted,
-    getTimeRemaining,
-    getProposalStatusText,
   } = useGovernance();
-
-
-  // Check user's voting status
-  useEffect(() => {
-    if (address) {
-      // Check voting status for all proposals
-      const checkVotingStatus = async () => {
-        const statusMap: Record<number, boolean> = {};
-        for (const proposal of proposals) {
-          const voted = await hasUserVoted(proposal.id);
-          statusMap[proposal.id] = voted;
-        }
-        setUserVotedStatus(statusMap);
-      };
-      
-      checkVotingStatus();
-    }
-  }, [address, proposals, hasUserVoted]);
 
 
   const handleVote = async (proposalId: number, support: boolean) => {
@@ -49,8 +33,6 @@ export default function GovernanceInterface() {
     try {
       await vote(proposalId, support);
       await fetchProposals();
-      // Update local voting status
-      setUserVotedStatus(prev => ({ ...prev, [proposalId]: true }));
       
       toast.success(`Successfully voted ${voteType} proposal #${proposalId}!`, {
         id: loadingToast,
@@ -79,6 +61,11 @@ export default function GovernanceInterface() {
         id: loadingToast,
       });
     }
+  };
+
+  const handleProposalCreated = () => {
+    fetchProposals();
+    setShowCreateForm(false);
   };
 
 
@@ -142,7 +129,7 @@ export default function GovernanceInterface() {
         </div>
 
         {/* User Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
             <div className="text-2xl font-bold text-white mb-1">
               {parseFloat(userBalance).toLocaleString()}
@@ -150,10 +137,16 @@ export default function GovernanceInterface() {
             <div className="text-gray-300 text-sm">AURA Tokens</div>
           </div>
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
-            <div className="text-2xl font-bold text-green-400 mb-1">
-              {Object.values(userVotedStatus).filter(Boolean).length}
+            <div className="text-2xl font-bold text-purple-400 mb-1">
+              {parseFloat(userVotingPower).toLocaleString()}
             </div>
-            <div className="text-gray-300 text-sm">Votes Cast</div>
+            <div className="text-gray-300 text-sm">Voting Power</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
+            <div className="text-2xl font-bold text-green-400 mb-1">
+              {proposals.length}
+            </div>
+            <div className="text-gray-300 text-sm">Total Proposals</div>
           </div>
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center">
             <div className="text-2xl font-bold text-blue-400 mb-1">
@@ -163,136 +156,44 @@ export default function GovernanceInterface() {
           </div>
         </div>
 
-        {/* No tabs needed - just show proposals */}
+        {/* Contract Test - Temporary for debugging */}
+        <ContractTest />
 
-        {/* Proposals */}
-        <div className="space-y-6">
-            {loading ? (
-              <div className="text-center text-gray-300">Loading proposals...</div>
-            ) : proposals.length === 0 ? (
-              <div className="text-center text-gray-300">No proposals found.</div>
-            ) : (
-              proposals.map((proposal) => {
-                const status = getProposalStatusText(proposal);
-                const timeRemaining = getTimeRemaining(proposal.endTime);
-                const hasVoted = userVotedStatus[proposal.id];
-                const totalVotes = proposal.yesVotes + proposal.noVotes;
-                const yesPercentage = totalVotes > 0 ? Number((proposal.yesVotes * BigInt(10000)) / totalVotes) / 100 : 0;
-                const noPercentage = totalVotes > 0 ? Number((proposal.noVotes * BigInt(10000)) / totalVotes) / 100 : 0;
+        {/* Delegation Helper */}
+        <DelegationHelper onDelegationComplete={() => {}} />
 
-                return (
-                  <div
-                    key={proposal.id}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-semibold text-white">
-                            Proposal #{proposal.id}
-                          </h3>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              status === "Active"
-                                ? "bg-green-500/20 text-green-400"
-                                : status === "Passed"
-                                ? "bg-blue-500/20 text-blue-400"
-                                : status === "Upcoming"
-                                ? "bg-yellow-500/20 text-yellow-400"
-                                : status === "Executed"
-                                ? "bg-purple-500/20 text-purple-400"
-                                : "bg-red-500/20 text-red-400"
-                            }`}
-                          >
-                            {status}
-                          </span>
-                          {hasVoted && (
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
-                              Voted
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-gray-300 text-sm mb-3">
-                          {proposal.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-400">
-                          <span>ID: #{proposal.id}</span>
-                          <span>Proposer: {proposal.proposer.slice(0, 6)}...{proposal.proposer.slice(-4)}</span>
-                          <span>New Fee: {Number(proposal.newFee)} basis points</span>
-                          <span>Ends: {timeRemaining}</span>
-                        </div>
-                      </div>
-                    </div>
+        {/* Create Proposal Button */}
+        <div className="text-center mb-8">
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="px-8 py-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 hover:from-blue-600/30 hover:to-purple-600/30 border border-blue-500/30 text-blue-400 font-medium rounded-xl transition-all duration-300 transform hover:scale-105"
+          >
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create New Proposal
+            </div>
+          </button>
+          <p className="text-gray-400 text-sm mt-2">
+            Create a proposal to change protocol parameters (requires 1,000+ AURA tokens)
+          </p>
+        </div>
 
-                    {/* Voting Progress */}
-                    {status !== "Upcoming" && totalVotes > 0 && (
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-green-400">
-                            For: {formatEther(proposal.yesVotes)} ({yesPercentage.toFixed(1)}%)
-                          </span>
-                          <span className="text-red-400">
-                            Against: {formatEther(proposal.noVotes)} ({noPercentage.toFixed(1)}%)
-                          </span>
-                        </div>
-                        <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                          <div className="h-full flex">
-                            <div
-                              className="bg-green-500"
-                              style={{ width: `${yesPercentage}%` }}
-                            ></div>
-                            <div
-                              className="bg-red-500"
-                              style={{ width: `${noPercentage}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="text-center text-gray-300 text-xs mt-1">
-                          {formatEther(totalVotes)} total votes
-                        </div>
-                      </div>
-                    )}
+        {/* Proposals List */}
+        <ProposalsList
+          onVote={handleVote}
+          onExecute={handleExecuteProposal}
+          isPending={isPending}
+        />
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                      {status === "Active" && !hasVoted && (
-                        <>
-                          <button
-                            onClick={() => handleVote(proposal.id, true)}
-                            disabled={isPending}
-                            className="flex-1 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400 font-medium py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
-                          >
-                            {isPending ? "Voting..." : "Vote For"}
-                          </button>
-                          <button
-                            onClick={() => handleVote(proposal.id, false)}
-                            disabled={isPending}
-                            className="flex-1 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 font-medium py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
-                          >
-                            {isPending ? "Voting..." : "Vote Against"}
-                          </button>
-                        </>
-                      )}
-                      
-                      {status === "Passed" && !proposal.executed && (
-                        <button
-                          onClick={() => handleExecuteProposal(proposal.id)}
-                          disabled={isPending}
-                          className="flex-1 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 font-medium py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
-                        >
-                          {isPending ? "Executing..." : "Execute Proposal"}
-                        </button>
-                      )}
-                      
-                      <button className="px-6 bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl transition-all duration-300">
-                        Details
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+        {/* Proposal Creation Form Modal */}
+        {showCreateForm && (
+          <ProposalCreationForm
+            onProposalCreated={handleProposalCreated}
+            onClose={() => setShowCreateForm(false)}
+          />
+        )}
       </div>
     </div>
   );
