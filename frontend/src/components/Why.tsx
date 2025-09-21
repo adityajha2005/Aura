@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Card } from "@/components/ui/card";
+import { motion, useInView } from "motion/react";
 
 function Why() {
+  const headerRef = useRef(null);
+  const cardsRef = useRef(null);
+  const headerInView = useInView(headerRef, {
+    once: true,
+    margin: "0px 0px -100px 0px",
+  });
+  const cardsInView = useInView(cardsRef, {
+    once: true,
+    margin: "0px 0px -50px 0px",
+  });
+
   return (
     <div className="py-20">
       <section className="a min-h-screen bg-transparent p-8  overflow-hidden">
@@ -14,26 +26,106 @@ function Why() {
 
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 mb-8">
+          <div ref={headerRef} className="text-center mb-16">
+            <motion.div
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/5 mb-8"
+              initial={{
+                opacity: 0,
+                y: -40,
+                filter: "blur(12px)",
+                scale: 0.9,
+              }}
+              animate={
+                headerInView
+                  ? {
+                      opacity: 1,
+                      y: 0,
+                      filter: "blur(0px)",
+                      scale: 1,
+                    }
+                  : {
+                      opacity: 0,
+                      y: -40,
+                      filter: "blur(12px)",
+                      scale: 0.9,
+                    }
+              }
+              transition={{
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.1,
+              }}
+            >
               <div className="w-6 h-6 bg-red-500/20 rounded border border-red-500/40 flex items-center justify-center">
                 <span className="text-red-400 font-bold text-sm">A</span>
               </div>
               <span className="text-red-100 font-medium">Aura Protocol</span>
-            </div>
+            </motion.div>
 
-            <h1
+            <motion.h1
               className="text-5xl md:text-6xl font-light text-white mb-4 tracking-wide"
               style={{
                 fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
               }}
+              initial={{
+                opacity: 0,
+                filter: "blur(15px)",
+                scale: 0.9,
+                y: -50,
+              }}
+              animate={
+                headerInView
+                  ? {
+                      opacity: 1,
+                      filter: "blur(0px)",
+                      scale: 1,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      filter: "blur(15px)",
+                      scale: 0.9,
+                      y: -50,
+                    }
+              }
+              transition={{
+                duration: 1,
+                ease: "easeOut",
+                delay: 0.3,
+              }}
             >
               WHY CHOOSE AURA ?
-            </h1>
+            </motion.h1>
           </div>
 
           {/* Feature Cards Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-9 gap-8 items-start">
+          <motion.div
+            ref={cardsRef}
+            className="grid grid-cols-1 lg:grid-cols-9 gap-8 items-start"
+            initial={{
+              opacity: 0,
+              y: -30,
+              filter: "blur(10px)",
+            }}
+            animate={
+              cardsInView
+                ? {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }
+                : {
+                    opacity: 0,
+                    y: -30,
+                    filter: "blur(10px)",
+                  }
+            }
+            transition={{
+              duration: 0.9,
+              delay: 0.5,
+              ease: "easeOut",
+            }}
+          >
             {/* CEX-Like Speed Card */}
             <Card className="relative bg-gradient-to-br col-span-4 from-red-950/40 to-black/60 border-red-500/20 backdrop-blur-sm p-8 h-[400px] overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent"></div>
@@ -150,7 +242,7 @@ function Why() {
               <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/8 rounded-full blur-lg"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-red-600/10 rounded-full blur-xl"></div>
             </Card>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

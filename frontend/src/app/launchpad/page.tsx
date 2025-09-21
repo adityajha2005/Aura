@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
 import { formatEther, parseEther } from "viem";
 import toast from "react-hot-toast";
+import { motion, useInView } from "framer-motion";
 import {
   useLaunchpad,
   useCreateTokenAndLaunch,
@@ -17,6 +18,16 @@ import GlowButton from "@/components/ui/glow-button";
 export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");
   const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // Animation refs
+  const projectsRef = useRef(null);
+  const launchRef = useRef(null);
+  const securityRef = useRef(null);
+
+  // Viewport detection
+  const isProjectsInView = useInView(projectsRef, { once: true, margin: "-100px" });
+  const isLaunchInView = useInView(launchRef, { once: true, margin: "-100px" });
+  const isSecurityInView = useInView(securityRef, { once: true, margin: "-100px" });
 
   const { address } = useAccount();
   const { launches, launchCount, loading, error, refetch } = useLaunchpad();
@@ -144,24 +155,42 @@ export default function LaunchpadPage() {
       {/* Main Content */}
       <div className="relative z-20 max-w-7xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, filter: "blur(20px)", y: -30 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.h1
             className="text-5xl font-bold text-white mb-4"
             style={{
               fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
             }}
+            initial={{ opacity: 0, filter: "blur(20px)", y: -20 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
             Fair Launchpad
-          </h1>
-          <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+          </motion.h1>
+          <motion.p 
+            className="text-gray-300 text-lg max-w-3xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(15px)", y: -15 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
             Launch your project with confidence. Our AI-powered launchpad
             provides security analysis, automated liquidity bootstrapping, and
             anti-rug pull mechanisms.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center mb-8">
+        <motion.div 
+          className="flex justify-center mb-8"
+          initial={{ opacity: 0, filter: "blur(15px)", y: -20 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        >
           <div
             className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex"
             style={{
@@ -169,8 +198,8 @@ export default function LaunchpadPage() {
                 "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
             }}
           >
-            {["projects", "launch", "security"].map((tab) => (
-              <button
+            {["projects", "launch", "security"].map((tab, index) => (
+              <motion.button
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
                 className={`px-6 py-2 rounded-full transition-all duration-300 capitalize ${
@@ -178,17 +207,31 @@ export default function LaunchpadPage() {
                     ? "bg-white/20 text-white"
                     : "text-gray-300 hover:text-white hover:bg-white/10"
                 }`}
+                initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                transition={{ duration: 0.6, delay: 1.0 + index * 0.1 }}
               >
                 {tab}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Projects Tab */}
         {selectedTab === "projects" && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
+          <motion.div 
+            ref={projectsRef}
+            className="space-y-6"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={isProjectsInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(20px)", y: 50 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div 
+              className="flex justify-between items-center"
+              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={isProjectsInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(15px)", y: 30 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               <h2 className="text-2xl font-semibold text-white">
                 Active & Upcoming Projects ({launchCount})
               </h2>
@@ -200,7 +243,7 @@ export default function LaunchpadPage() {
                   Create Launch
                 </GlowButton>
               </button>
-            </div>
+            </motion.div>
 
             {loading && (
               <div className="text-center py-8">
@@ -262,18 +305,27 @@ export default function LaunchpadPage() {
                 );
               })}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Launch Tab */}
         {selectedTab === "launch" && (
-          <div className="max-w-4xl mx-auto">
-            <div
+          <motion.div 
+            ref={launchRef}
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={isLaunchInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(20px)", y: 50 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={isLaunchInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(15px)", y: 30 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Launch Your Project
@@ -418,19 +470,28 @@ export default function LaunchpadPage() {
                   ? "Connect Wallet to Launch"
                   : "Create Token & Launch"}
               </button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Security Tab */}
         {selectedTab === "security" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div
+          <motion.div 
+            ref={securityRef}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={isSecurityInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(20px)", y: 50 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", x: -30 }}
+              animate={isSecurityInView ? { opacity: 1, filter: "blur(0px)", x: 0 } : { opacity: 0, filter: "blur(15px)", x: -30 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h3 className="text-2xl font-semibold text-white mb-6">
                 AI Security Features
@@ -510,14 +571,17 @@ export default function LaunchpadPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", x: 30 }}
+              animate={isSecurityInView ? { opacity: 1, filter: "blur(0px)", x: 0 } : { opacity: 0, filter: "blur(15px)", x: 30 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
             >
               <h3 className="text-2xl font-semibold text-white mb-6">
                 Security Stats
@@ -542,8 +606,8 @@ export default function LaunchpadPage() {
                   <div className="text-gray-300">Projects Analyzed</div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
 
