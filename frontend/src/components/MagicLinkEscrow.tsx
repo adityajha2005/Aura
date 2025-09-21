@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import {
   useMagicLinkEscrow,
   useCreateEscrow,
@@ -647,6 +647,24 @@ export default function MagicLinkEscrow() {
 
   const isDemoMode = !address;
 
+  // Animation refs
+  const createRef = useRef(null);
+  const claimRef = useRef(null);
+  const myEscrowsRef = useRef(null);
+  const allEscrowsRef = useRef(null);
+
+  // Viewport detection
+  const isCreateInView = useInView(createRef, { once: true, margin: "-100px" });
+  const isClaimInView = useInView(claimRef, { once: true, margin: "-100px" });
+  const isMyEscrowsInView = useInView(myEscrowsRef, {
+    once: true,
+    margin: "-100px",
+  });
+  const isAllEscrowsInView = useInView(allEscrowsRef, {
+    once: true,
+    margin: "-100px",
+  });
+
   return (
     <div className="min-h-screen relative overflow-hidden pt-20">
       {/* Static 3D Glass Cards Background */}
@@ -670,30 +688,53 @@ export default function MagicLinkEscrow() {
       {/* Main Content */}
       <div className="relative z-20 max-w-6xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, filter: "blur(20px)", y: -30 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.h1
             className="text-5xl font-bold text-white mb-4"
             style={{
               fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
             }}
+            initial={{ opacity: 0, filter: "blur(20px)", y: -20 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
             Magic Link Escrow
-          </h1>
-          <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+          </motion.h1>
+          <motion.p
+            className="text-gray-300 text-lg max-w-3xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(15px)", y: -15 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
             Create secure, time-locked escrows with secret-based claiming. Send
             crypto to anyone with just a link.
-          </p>
+          </motion.p>
           {isDemoMode && (
-            <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
+            <motion.div
+              className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-xl"
+              initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+              animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
               <p className="text-yellow-300 text-sm">
                 Demo Mode: Connect your wallet to interact with real contracts
               </p>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center mb-8">
+        <motion.div
+          className="flex justify-center mb-8"
+          initial={{ opacity: 0, filter: "blur(15px)", y: -20 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        >
           <div
             className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-1 flex"
             style={{
@@ -701,31 +742,53 @@ export default function MagicLinkEscrow() {
                 "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
             }}
           >
-            {["create", "claim", "my-escrows", "all-escrows"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setSelectedTab(tab)}
-                className={`px-6 py-2 rounded-full transition-all duration-300 capitalize ${
-                  selectedTab === tab
-                    ? "bg-white/20 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                {tab.replace("-", " ")}
-              </button>
-            ))}
+            {["create", "claim", "my-escrows", "all-escrows"].map(
+              (tab, index) => (
+                <motion.button
+                  key={tab}
+                  onClick={() => setSelectedTab(tab)}
+                  className={`px-6 py-2 rounded-full transition-all duration-300 capitalize ${
+                    selectedTab === tab
+                      ? "bg-white/20 text-white"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                  }`}
+                  initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                  animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                  transition={{ duration: 0.6, delay: 1.0 + index * 0.1 }}
+                >
+                  {tab.replace("-", " ")}
+                </motion.button>
+              )
+            )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Create Tab */}
         {selectedTab === "create" && (
-          <div className="max-w-2xl mx-auto">
-            <div
+          <motion.div
+            ref={createRef}
+            className="max-w-2xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isCreateInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={
+                isCreateInView
+                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                  : { opacity: 0, filter: "blur(15px)", y: 30 }
+              }
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Create Magic Link Escrow
@@ -1164,19 +1227,36 @@ export default function MagicLinkEscrow() {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Claim Tab */}
         {selectedTab === "claim" && (
-          <div className="max-w-2xl mx-auto">
-            <div
+          <motion.div
+            ref={claimRef}
+            className="max-w-2xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isClaimInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={
+                isClaimInView
+                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                  : { opacity: 0, filter: "blur(15px)", y: 30 }
+              }
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-8">
                 Claim Magic Link Escrow
@@ -1312,19 +1392,36 @@ export default function MagicLinkEscrow() {
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* My Escrows Tab */}
         {selectedTab === "my-escrows" && (
-          <div className="max-w-4xl mx-auto">
-            <div
+          <motion.div
+            ref={myEscrowsRef}
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isMyEscrowsInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={
+                isMyEscrowsInView
+                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                  : { opacity: 0, filter: "blur(15px)", y: 30 }
+              }
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-6">
                 My Escrows ({userEscrows.length})
@@ -1372,19 +1469,36 @@ export default function MagicLinkEscrow() {
                     ))}
                 </div>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* All Escrows Tab */}
         {selectedTab === "all-escrows" && (
-          <div className="max-w-4xl mx-auto">
-            <div
+          <motion.div
+            ref={allEscrowsRef}
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isAllEscrowsInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <motion.div
               className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6"
               style={{
                 boxShadow:
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
+              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={
+                isAllEscrowsInView
+                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                  : { opacity: 0, filter: "blur(15px)", y: 30 }
+              }
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-6">
                 All Escrows (
@@ -1441,8 +1555,8 @@ export default function MagicLinkEscrow() {
                     ))}
                 </div>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </div>
