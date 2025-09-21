@@ -20,6 +20,7 @@ import {
 } from "@/hooks/useMagicLinkEscrow";
 import { CONTRACT_ADDRESSES } from "@/config/contracts";
 import GlowButton from "./ui/glow-button";
+import LoadingSpinner from "./ui/loading-spinner";
 
 // Tooltip component
 const Tooltip = ({
@@ -80,9 +81,7 @@ function EscrowPreview({ escrowId }: { escrowId: number }) {
   };
 
   if (isLoading) {
-    return (
-      <div className="text-gray-300 text-sm">Loading escrow details...</div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error || !escrowDetails) {
@@ -1387,7 +1386,7 @@ export default function MagicLinkEscrow() {
 
               {escrowsLoading ? (
                 <div className="text-center py-8">
-                  <div className="text-gray-300">Loading your escrows...</div>
+                  <LoadingSpinner />
                 </div>
               ) : userEscrows.length === 0 ? (
                 <div className="text-center py-8">
@@ -1463,7 +1462,7 @@ export default function MagicLinkEscrow() {
 
               {escrowsLoading ? (
                 <div className="text-center py-8">
-                  <div className="text-gray-300">Loading escrows...</div>
+                  <LoadingSpinner />
                 </div>
               ) : escrows.filter((escrow) => {
                   const isExpired =

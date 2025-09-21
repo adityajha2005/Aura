@@ -23,14 +23,14 @@ export default function RootLayout({
       >
         <div className="h-screen w-full  relative overflow-y-auto">
           <StarsBackground
-            className="z-10"
+            className="fixed inset-0 z-10 pointer-events-none"
             starDensity={0.0001}
             minTwinkleSpeed={0.3}
             maxTwinkleSpeed={1.2}
           />
 
           <div
-            className="absolute inset-0 -z-50  pointer-events-none"
+            className="fixed inset-0 -z-50 pointer-events-none"
             style={{
               backgroundImage: `
        radial-gradient(circle at center, rgba(255, 0, 0, 0.18), transparent)
@@ -45,22 +45,22 @@ export default function RootLayout({
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: 'rgba(0, 0, 0, 0.8)',
-                  color: '#fff',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  backdropFilter: 'blur(10px)',
+                  background: "rgba(0, 0, 0, 0.8)",
+                  color: "#fff",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "12px",
+                  backdropFilter: "blur(10px)",
                 },
                 success: {
                   iconTheme: {
-                    primary: '#10B981',
-                    secondary: '#fff',
+                    primary: "#10B981",
+                    secondary: "#fff",
                   },
                 },
                 error: {
                   iconTheme: {
-                    primary: '#EF4444',
-                    secondary: '#fff',
+                    primary: "#EF4444",
+                    secondary: "#fff",
                   },
                 },
               }}
