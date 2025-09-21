@@ -21,7 +21,7 @@ export default function RootLayout({
       <body
         className={`antialiased font-sans bg-black ${ttFirsNeue.variable} ${dmSans.variable}`}
       >
-        <div className="min-h-screen w-full  relative overflow-hidden">
+        <div className="h-screen w-full  relative overflow-y-auto">
           <StarsBackground
             className="z-10"
             starDensity={0.0001}
@@ -30,7 +30,7 @@ export default function RootLayout({
           />
 
           <div
-            className="absolute inset-0 z-10  pointer-events-none"
+            className="absolute inset-0 -z-50  pointer-events-none"
             style={{
               backgroundImage: `
        radial-gradient(circle at center, rgba(255, 0, 0, 0.18), transparent)

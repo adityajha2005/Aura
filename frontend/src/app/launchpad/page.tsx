@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatEther, parseEther } from "viem";
 import toast from "react-hot-toast";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   useLaunchpad,
   useCreateTokenAndLaunch,
@@ -19,21 +19,7 @@ export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  // Animation refs
-  const projectsRef = useRef(null);
-  const launchRef = useRef(null);
-  const securityRef = useRef(null);
-
-  // Viewport detection
-  const isProjectsInView = useInView(projectsRef, {
-    once: true,
-    margin: "-100px",
-  });
-  const isLaunchInView = useInView(launchRef, { once: true, margin: "-100px" });
-  const isSecurityInView = useInView(securityRef, {
-    once: true,
-    margin: "-100px",
-  });
+  // Animation refs - removed useInView to prevent tab switching jitter
 
   const { address } = useAccount();
   const { launches, launchCount, loading, error, refetch } = useLaunchpad();
@@ -226,25 +212,17 @@ export default function LaunchpadPage() {
         {/* Projects Tab */}
         {selectedTab === "projects" && (
           <motion.div
-            ref={projectsRef}
             className="space-y-6"
-            initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
-            animate={
-              isProjectsInView
-                ? { opacity: 1, filter: "blur(0px)", y: 0 }
-                : { opacity: 0, filter: "blur(20px)", y: 50 }
-            }
-            transition={{ duration: 0.8, delay: 0.2 }}
+            initial={{ opacity: 0, filter: "blur(20px)", y: 30 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            exit={{ opacity: 0, filter: "blur(20px)", y: -30 }}
+            transition={{ duration: 0.5 }}
           >
             <motion.div
               className="flex justify-between items-center"
-              initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
-              animate={
-                isProjectsInView
-                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
-                  : { opacity: 0, filter: "blur(15px)", y: 30 }
-              }
-              transition={{ duration: 0.6, delay: 0.4 }}
+              initial={{ opacity: 0, filter: "blur(15px)", y: 20 }}
+              animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
             >
               <h2 className="text-2xl font-semibold text-white">
                 Active & Upcoming Projects ({launchCount})
@@ -272,7 +250,7 @@ export default function LaunchpadPage() {
                 </div>
                 <button
                   onClick={() => refetch()}
-                  className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white px-6 py-2 rounded-full transition-all duration-300"
+                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-6 py-2 rounded-full transition-all duration-300"
                 >
                   Retry
                 </button>
@@ -325,14 +303,9 @@ export default function LaunchpadPage() {
         {/* Launch Tab */}
         {selectedTab === "launch" && (
           <motion.div
-            ref={launchRef}
             className="max-w-4xl mx-auto"
             initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
-            animate={
-              isLaunchInView
-                ? { opacity: 1, filter: "blur(0px)", y: 0 }
-                : { opacity: 0, filter: "blur(20px)", y: 50 }
-            }
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <motion.div
@@ -342,11 +315,7 @@ export default function LaunchpadPage() {
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
               initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
-              animate={
-                isLaunchInView
-                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
-                  : { opacity: 0, filter: "blur(15px)", y: 30 }
-              }
+              animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-8">
@@ -467,10 +436,10 @@ export default function LaunchpadPage() {
                     </select>
                   </div>
 
-                  <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-300/30 rounded-xl p-4">
+                  <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-300/30 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                      <span className="text-purple-300 text-sm font-medium">
+                      <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                      <span className="text-red-300 text-sm font-medium">
                         Launch Fee
                       </span>
                     </div>
@@ -484,7 +453,7 @@ export default function LaunchpadPage() {
               <button
                 onClick={handleCreateLaunch}
                 disabled={isCreating || !address}
-                className="w-full mt-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all duration-300"
+                className="w-full mt-8 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all duration-300"
               >
                 {isCreating
                   ? "Creating Launch..."
@@ -499,14 +468,9 @@ export default function LaunchpadPage() {
         {/* Security Tab */}
         {selectedTab === "security" && (
           <motion.div
-            ref={securityRef}
             className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
-            animate={
-              isSecurityInView
-                ? { opacity: 1, filter: "blur(0px)", y: 0 }
-                : { opacity: 0, filter: "blur(20px)", y: 50 }
-            }
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <motion.div
@@ -516,11 +480,7 @@ export default function LaunchpadPage() {
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
               initial={{ opacity: 0, filter: "blur(15px)", x: -30 }}
-              animate={
-                isSecurityInView
-                  ? { opacity: 1, filter: "blur(0px)", x: 0 }
-                  : { opacity: 0, filter: "blur(15px)", x: -30 }
-              }
+              animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h3 className="text-2xl font-semibold text-white mb-6">
@@ -610,11 +570,7 @@ export default function LaunchpadPage() {
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
               initial={{ opacity: 0, filter: "blur(15px)", x: 30 }}
-              animate={
-                isSecurityInView
-                  ? { opacity: 1, filter: "blur(0px)", x: 0 }
-                  : { opacity: 0, filter: "blur(15px)", x: 30 }
-              }
+              animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <h3 className="text-2xl font-semibold text-white mb-6">
@@ -794,10 +750,10 @@ export default function LaunchpadPage() {
                 </select>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-300/30 rounded-xl p-4">
+              <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-300/30 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                  <span className="text-purple-300 text-sm font-medium">
+                  <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                  <span className="text-red-300 text-sm font-medium">
                     Launch Fee
                   </span>
                 </div>
@@ -813,17 +769,18 @@ export default function LaunchpadPage() {
                 >
                   Cancel
                 </button>
-                <button
+                <GlowButton
+                  variant="red"
                   onClick={handleCreateLaunch}
                   disabled={isCreating || !address}
-                  className="flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                  className="flex-1 justify-center items-center disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all duration-300"
                 >
                   {isCreating
                     ? "Creating..."
                     : !address
                     ? "Connect Wallet"
                     : "Create & Launch"}
-                </button>
+                </GlowButton>
               </div>
             </div>
           </div>
