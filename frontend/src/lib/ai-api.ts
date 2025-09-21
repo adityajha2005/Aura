@@ -71,7 +71,7 @@ class AuraAIClient {
   private readonly cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
-    this.baseUrl = config.ai.apiUrl || "http://localhost:8000";
+    this.baseUrl = config.ai.apiUrl || "https://aura-production-6374.up.railway.app";
   }
 
   private getCacheKey(

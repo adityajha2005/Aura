@@ -4,7 +4,7 @@
 
 export const config = {
   ai: {
-    apiUrl: process.env.NEXT_PUBLIC_AI_API_URL || "http://localhost:8000",
+    apiUrl: process.env.NEXT_PUBLIC_AI_API_URL || "https://aura-production-6374.up.railway.app",
     enabled: process.env.NEXT_PUBLIC_AI_ENABLED !== "false",
   },
   contracts: {
