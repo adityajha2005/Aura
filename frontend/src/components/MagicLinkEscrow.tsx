@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   useMagicLinkEscrow,
   useCreateEscrow,
@@ -19,12 +21,40 @@ import {
 import { CONTRACT_ADDRESSES } from "@/config/contracts";
 import GlowButton from "./ui/glow-button";
 
+// Tooltip component
+const Tooltip = ({
+  children,
+  text,
+}: {
+  children: React.ReactNode;
+  text: string;
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      {children}
+      {isVisible && (
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg border border-gray-700 whitespace-nowrap z-50">
+          {text}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 border-r border-b border-gray-700 rotate-45"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Token options for the escrow
 const TOKEN_OPTIONS = [
   {
     symbol: "AVAX",
     address: "0x0000000000000000000000000000000000000000",
     color: "bg-red-500",
+    image: "/avax.png",
   },
   {
     symbol: "TEST",
@@ -192,7 +222,7 @@ function EscrowCard({
 
   return (
     <div
-      className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+      className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 min-w-0 overflow-hidden"
       style={{
         boxShadow:
           "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
@@ -232,19 +262,25 @@ function EscrowCard({
       </div>
 
       <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-4 text-sm">
-          <div>
-            <div className="text-gray-300 text-xs">Sender</div>
-            <div className="text-white font-mono text-xs truncate">
-              {escrow.sender.slice(0, 6)}...{escrow.sender.slice(-4)}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm overflow-hidden">
+          <div className="min-w-0 flex flex-col">
+            <div className="text-gray-300 text-xs mb-1">Sender</div>
+            <div className="text-white font-mono text-xs truncate w-full">
+              {escrow.sender.slice(0, 8)}...{escrow.sender.slice(-6)}
             </div>
           </div>
-          <div>
-            <div className="text-gray-300 text-xs">Expires</div>
-            <div className="text-white text-xs">
+          <div className="min-w-0 flex flex-col">
+            <div className="text-gray-300 text-xs mb-1">Expires</div>
+            <div className="text-white text-xs truncate w-full">
               {new Date(
                 Number(escrow.expirationTime) * 1000
               ).toLocaleDateString()}
+            </div>
+          </div>
+          <div className="min-w-0 flex flex-col">
+            <div className="text-gray-300 text-xs mb-1">Amount</div>
+            <div className="text-white text-xs truncate w-full">
+              {formatEther(escrow.amount)} {getTokenSymbol(escrow.token)}
             </div>
           </div>
         </div>
@@ -397,6 +433,7 @@ export default function MagicLinkEscrow() {
     escrowId: "",
     secret: "",
   });
+  const [currentTokenIndex, setCurrentTokenIndex] = useState(0);
 
   // Hooks
   const {
@@ -472,6 +509,16 @@ export default function MagicLinkEscrow() {
     }
   }, []);
 
+  // Sync carousel index with selected token
+  useEffect(() => {
+    const tokenIndex = TOKEN_OPTIONS.findIndex(
+      (token) => token.address === formData.token
+    );
+    if (tokenIndex !== -1) {
+      setCurrentTokenIndex(tokenIndex);
+    }
+  }, [formData.token]);
+
   // Reset form on successful creation and capture escrow ID
   useEffect(() => {
     if (isCreateSuccess) {
@@ -493,7 +540,13 @@ export default function MagicLinkEscrow() {
       }
       refetch();
     }
-  }, [isCreateSuccess, escrowCount, refetch, formData.secret, formData.recipientEmail]);
+  }, [
+    isCreateSuccess,
+    escrowCount,
+    refetch,
+    formData.secret,
+    formData.recipientEmail,
+  ]);
 
   // Refetch on other successful operations
   useEffect(() => {
@@ -684,37 +737,206 @@ export default function MagicLinkEscrow() {
                   <label className="text-gray-300 text-sm mb-2 block">
                     Select Token
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {TOKEN_OPTIONS.map((token) => (
-                      <button
-                        key={token.symbol}
-                        onClick={() =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            token: token.address,
-                          }))
-                        }
-                        className={`p-4 rounded-xl border transition-all duration-300 ${
-                          formData.token === token.address
-                            ? "bg-white/20 border-white/30 text-white"
-                            : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
-                        }`}
+                  <div className="relative">
+                    {/* Carousel Container */}
+                    <div className="overflow-hidden rounded-xl bg-white/5 border border-white/10">
+                      <motion.div
+                        className="flex transition-transform duration-500 ease-in-out"
+                        animate={{ x: -currentTokenIndex * 100 + "%" }}
                       >
-                        <div className="text-center">
-                          <div
-                            className={`w-8 h-8 ${token.color} rounded-full mx-auto mb-2`}
-                          ></div>
-                          <span className="font-medium">{token.symbol}</span>
-                        </div>
-                      </button>
-                    ))}
+                        {TOKEN_OPTIONS.map((token, index) => {
+                          const isSelected = formData.token === token.address;
+                          const isVisible = index === currentTokenIndex;
+                          return (
+                            <motion.div
+                              key={token.symbol}
+                              className="min-w-full flex justify-center py-6"
+                              initial={false}
+                              animate={{
+                                scale: isVisible ? 1 : 0.9,
+                                opacity: isVisible ? 1 : 0.6,
+                              }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              <motion.button
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    token: token.address,
+                                  }));
+                                  setCurrentTokenIndex(index);
+                                }}
+                                className={`relative p-8 rounded-xl border-2 transition-all duration-300 transform ${
+                                  isSelected
+                                    ? "bg-white/20 border-white/40 text-white shadow-2xl"
+                                    : "bg-white/5 border-white/20 text-gray-300 hover:bg-white/10 hover:border-white/30"
+                                }`}
+                                style={{
+                                  minWidth: "160px",
+                                  boxShadow: isSelected
+                                    ? "0 12px 48px rgba(255, 255, 255, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.1)"
+                                    : "0 4px 16px rgba(0, 0, 0, 0.1)",
+                                }}
+                                whileHover={{ scale: 1.05, y: -4 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <div className="text-center">
+                                  {token.image ? (
+                                    <motion.div
+                                      className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden bg-white/10 flex items-center justify-center"
+                                      whileHover={{ rotate: 360 }}
+                                      transition={{ duration: 0.6 }}
+                                    >
+                                      <Image
+                                        src={token.image}
+                                        alt={token.symbol}
+                                        width={48}
+                                        height={48}
+                                        className="rounded-full"
+                                      />
+                                    </motion.div>
+                                  ) : (
+                                    <motion.div
+                                      className={`w-16 h-16 ${token.color} rounded-full mx-auto mb-4 flex items-center justify-center`}
+                                      whileHover={{ rotate: 360 }}
+                                      transition={{ duration: 0.6 }}
+                                    >
+                                      <span className="text-white font-bold text-2xl">
+                                        {token.symbol.charAt(0)}
+                                      </span>
+                                    </motion.div>
+                                  )}
+                                  <span className="font-semibold text-xl block mb-1">
+                                    {token.symbol}
+                                  </span>
+                                  <span className="text-gray-400 text-sm">
+                                    {token.symbol === "AVAX"
+                                      ? "Avalanche"
+                                      : token.symbol === "TEST"
+                                      ? "Test Token"
+                                      : "Governance Token"}
+                                  </span>
+                                  {isSelected && (
+                                    <motion.div
+                                      className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      transition={{
+                                        type: "spring",
+                                        stiffness: 500,
+                                        damping: 15,
+                                      }}
+                                    >
+                                      <svg
+                                        className="w-5 h-5 text-white"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </motion.div>
+                                  )}
+                                </div>
+                              </motion.button>
+                            </motion.div>
+                          );
+                        })}
+                      </motion.div>
+                    </div>
+
+                    {/* Navigation Arrows */}
+                    <motion.button
+                      onClick={() =>
+                        setCurrentTokenIndex(
+                          (prev) =>
+                            (prev - 1 + TOKEN_OPTIONS.length) %
+                            TOKEN_OPTIONS.length
+                        )
+                      }
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center transition-all duration-300"
+                      whileHover={{ scale: 1.1, x: -2 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
+                      </svg>
+                    </motion.button>
+
+                    <motion.button
+                      onClick={() =>
+                        setCurrentTokenIndex(
+                          (prev) => (prev + 1) % TOKEN_OPTIONS.length
+                        )
+                      }
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center transition-all duration-300"
+                      whileHover={{ scale: 1.1, x: 2 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </motion.button>
+
+                    {/* Indicator Dots */}
+                    <div className="flex justify-center mt-4 gap-2">
+                      {TOKEN_OPTIONS.map((_, index) => (
+                        <motion.button
+                          key={index}
+                          onClick={() => setCurrentTokenIndex(index)}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            index === currentTokenIndex
+                              ? "bg-white/80 w-6"
+                              : "bg-white/30 hover:bg-white/50"
+                          }`}
+                          whileHover={{ scale: 1.2 }}
+                          whileTap={{ scale: 0.8 }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 {/* Amount Input */}
                 <div>
-                  <label className="text-gray-300 text-sm mb-2 block">
+                  <label className="text-gray-300 text-sm mb-2 block flex items-center gap-2">
                     Amount
+                    <Tooltip text="Enter the amount of tokens you want to send in the escrow">
+                      <svg
+                        className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </Tooltip>
                   </label>
                   <div className="relative">
                     <input
@@ -739,8 +961,21 @@ export default function MagicLinkEscrow() {
 
                 {/* Expiration Time */}
                 <div>
-                  <label className="text-gray-300 text-sm mb-2 block">
+                  <label className="text-gray-300 text-sm mb-2 block flex items-center gap-2">
                     Expiration Time
+                    <Tooltip text="Set when the escrow will expire. After expiration, the sender can reclaim the funds">
+                      <svg
+                        className="w-4 h-4 text-gray-400 hover:text-gray-300 cursor-help"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </Tooltip>
                   </label>
                   <select
                     value={formData.expiration}
@@ -784,7 +1019,8 @@ export default function MagicLinkEscrow() {
                       disabled={isDemoMode}
                       className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-400 outline-none focus:border-white/30 disabled:opacity-50"
                     />
-                    <button
+                    <GlowButton
+                      variant="red"
                       onClick={() =>
                         setFormData((prev) => ({
                           ...prev,
@@ -792,10 +1028,10 @@ export default function MagicLinkEscrow() {
                         }))
                       }
                       disabled={isDemoMode}
-                      className="px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 disabled:opacity-50"
+                      className="px-4  text-white  transition-all duration-300 disabled:opacity-50"
                     >
                       Generate
-                    </button>
+                    </GlowButton>
                   </div>
                   <p className="text-gray-400 text-xs mt-1">
                     Share this secret with the recipient to claim the escrow
@@ -948,7 +1184,7 @@ export default function MagicLinkEscrow() {
 
               <div className="space-y-6">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
                       className="w-10 h-10 text-white"
                       fill="none"
@@ -1105,7 +1341,7 @@ export default function MagicLinkEscrow() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-96 overflow-y-auto pr-2">
                   {userEscrows
                     .map((escrowId) => {
                       // Contract uses 1-based indexing, so escrowId is the actual contract ID
@@ -1177,7 +1413,7 @@ export default function MagicLinkEscrow() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-96 overflow-y-auto pr-2">
                   {escrows
                     .map((escrow, index) => ({ escrow, escrowId: index + 1 }))
                     .filter(({ escrow }) => {
@@ -1208,97 +1444,6 @@ export default function MagicLinkEscrow() {
             </div>
           </div>
         )}
-
-        {/* Benefits Section */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
-            style={{
-              boxShadow:
-                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
-            }}
-          >
-            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-6 h-6 text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-white font-semibold mb-2">
-              Secret-Based Security
-            </h3>
-            <p className="text-gray-300 text-sm">
-              Only those with the secret can claim the escrow funds
-            </p>
-          </div>
-
-          <div
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
-            style={{
-              boxShadow:
-                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
-            }}
-          >
-            <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-6 h-6 text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-white font-semibold mb-2">Time-Locked</h3>
-            <p className="text-gray-300 text-sm">
-              Automatic expiration ensures funds don&apos;t get stuck forever
-            </p>
-          </div>
-
-          <div
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center"
-            style={{
-              boxShadow:
-                "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
-            }}
-          >
-            <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-6 h-6 text-purple-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                />
-              </svg>
-            </div>
-            <h3 className="text-white font-semibold mb-2">
-              Multi-Token Support
-            </h3>
-            <p className="text-gray-300 text-sm">
-              Support for ETH and ERC20 tokens with easy claiming
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

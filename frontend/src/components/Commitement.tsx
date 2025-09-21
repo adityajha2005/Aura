@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
+import { motion, useInView } from "motion/react";
 
 export default function AuraCommitmentSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const titleRef = useRef(null);
+  const cardRef = useRef(null);
+  const titleInView = useInView(titleRef, {
+    once: true,
+    margin: "0px 0px -100px 0px",
+  });
+  const cardInView = useInView(cardRef, {
+    once: true,
+    margin: "0px 0px -50px 0px",
+  });
 
   const slides = [
     {
@@ -177,11 +188,37 @@ export default function AuraCommitmentSection() {
 
         <div className="relative z-10 max-w-6xl mx-auto text-center">
           {/* Main heading */}
-          <div className="">
-            <h1
+          <div ref={titleRef} className="">
+            <motion.h1
               className="text-4xl -mt-40 md:text-7xl font-light text-white mb-4 tracking-tight leading-tight"
               style={{
                 fontFamily: "var(--font-tt-firs-neue), Arial, sans-serif",
+              }}
+              initial={{
+                opacity: 0,
+                filter: "blur(15px)",
+                scale: 0.9,
+                y: -50,
+              }}
+              animate={
+                titleInView
+                  ? {
+                      opacity: 1,
+                      filter: "blur(0px)",
+                      scale: 1,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      filter: "blur(15px)",
+                      scale: 0.9,
+                      y: -50,
+                    }
+              }
+              transition={{
+                duration: 1,
+                ease: "easeOut",
+                delay: 0.2,
               }}
             >
               <span
@@ -208,11 +245,40 @@ export default function AuraCommitmentSection() {
               >
                 TO YOU!
               </span>
-            </h1>
+            </motion.h1>
           </div>
 
           {/* Main card - curved/bent shape */}
-          <div className="relative max-w-4xl mx-auto">
+          <motion.div
+            ref={cardRef}
+            className="relative max-w-4xl mx-auto"
+            initial={{
+              opacity: 0,
+              y: -30,
+              filter: "blur(10px)",
+              scale: 0.95,
+            }}
+            animate={
+              cardInView
+                ? {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                    scale: 1,
+                  }
+                : {
+                    opacity: 0,
+                    y: -30,
+                    filter: "blur(10px)",
+                    scale: 0.95,
+                  }
+            }
+            transition={{
+              duration: 0.9,
+              delay: 0.6,
+              ease: "easeOut",
+            }}
+          >
             {/* Navigation arrows */}
             <button
               onClick={prevSlide}
@@ -282,7 +348,7 @@ export default function AuraCommitmentSection() {
                 />
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
