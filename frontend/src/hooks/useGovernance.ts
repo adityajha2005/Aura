@@ -116,6 +116,22 @@ export function useGovernance() {
     }
   };
 
+  // Create a new proposal
+  const createProposal = async (description: string, newFee: bigint) => {
+    try {
+      // @ts-expect-error - Wagmi/Viem version compatibility issue
+      await writeContract({
+        address: CONTRACT_ADDRESSES.Governance,
+        abi: GovernanceABI,
+        functionName: "createProposal",
+        args: [description, newFee],
+      });
+    } catch (error) {
+      console.error("Error creating proposal:", error);
+      throw error;
+    }
+  };
+
   // Execute a proposal
   const executeProposal = async (proposalId: number) => {
     try {
@@ -200,6 +216,7 @@ export function useGovernance() {
     error,
 
     // Actions
+    createProposal,
     vote,
     executeProposal,
     fetchProposals,
