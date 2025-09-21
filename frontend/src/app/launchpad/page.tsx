@@ -25,9 +25,15 @@ export default function LaunchpadPage() {
   const securityRef = useRef(null);
 
   // Viewport detection
-  const isProjectsInView = useInView(projectsRef, { once: true, margin: "-100px" });
+  const isProjectsInView = useInView(projectsRef, {
+    once: true,
+    margin: "-100px",
+  });
   const isLaunchInView = useInView(launchRef, { once: true, margin: "-100px" });
-  const isSecurityInView = useInView(securityRef, { once: true, margin: "-100px" });
+  const isSecurityInView = useInView(securityRef, {
+    once: true,
+    margin: "-100px",
+  });
 
   const { address } = useAccount();
   const { launches, launchCount, loading, error, refetch } = useLaunchpad();
@@ -155,7 +161,7 @@ export default function LaunchpadPage() {
       {/* Main Content */}
       <div className="relative z-20 max-w-7xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, filter: "blur(20px)", y: -30 }}
           animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -172,7 +178,7 @@ export default function LaunchpadPage() {
           >
             Fair Launchpad
           </motion.h1>
-          <motion.p 
+          <motion.p
             className="text-gray-300 text-lg max-w-3xl mx-auto"
             initial={{ opacity: 0, filter: "blur(15px)", y: -15 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -185,7 +191,7 @@ export default function LaunchpadPage() {
         </motion.div>
 
         {/* Tab Navigation */}
-        <motion.div 
+        <motion.div
           className="flex justify-center mb-8"
           initial={{ opacity: 0, filter: "blur(15px)", y: -20 }}
           animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -219,17 +225,25 @@ export default function LaunchpadPage() {
 
         {/* Projects Tab */}
         {selectedTab === "projects" && (
-          <motion.div 
+          <motion.div
             ref={projectsRef}
             className="space-y-6"
             initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
-            animate={isProjectsInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isProjectsInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <motion.div 
+            <motion.div
               className="flex justify-between items-center"
               initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
-              animate={isProjectsInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={
+                isProjectsInView
+                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                  : { opacity: 0, filter: "blur(15px)", y: 30 }
+              }
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white">
@@ -310,11 +324,15 @@ export default function LaunchpadPage() {
 
         {/* Launch Tab */}
         {selectedTab === "launch" && (
-          <motion.div 
+          <motion.div
             ref={launchRef}
             className="max-w-4xl mx-auto"
             initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
-            animate={isLaunchInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isLaunchInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <motion.div
@@ -324,7 +342,11 @@ export default function LaunchpadPage() {
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
               initial={{ opacity: 0, filter: "blur(15px)", y: 30 }}
-              animate={isLaunchInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(15px)", y: 30 }}
+              animate={
+                isLaunchInView
+                  ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                  : { opacity: 0, filter: "blur(15px)", y: 30 }
+              }
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h2 className="text-2xl font-semibold text-white mb-8">
@@ -476,11 +498,15 @@ export default function LaunchpadPage() {
 
         {/* Security Tab */}
         {selectedTab === "security" && (
-          <motion.div 
+          <motion.div
             ref={securityRef}
             className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             initial={{ opacity: 0, filter: "blur(20px)", y: 50 }}
-            animate={isSecurityInView ? { opacity: 1, filter: "blur(0px)", y: 0 } : { opacity: 0, filter: "blur(20px)", y: 50 }}
+            animate={
+              isSecurityInView
+                ? { opacity: 1, filter: "blur(0px)", y: 0 }
+                : { opacity: 0, filter: "blur(20px)", y: 50 }
+            }
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <motion.div
@@ -490,7 +516,11 @@ export default function LaunchpadPage() {
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
               initial={{ opacity: 0, filter: "blur(15px)", x: -30 }}
-              animate={isSecurityInView ? { opacity: 1, filter: "blur(0px)", x: 0 } : { opacity: 0, filter: "blur(15px)", x: -30 }}
+              animate={
+                isSecurityInView
+                  ? { opacity: 1, filter: "blur(0px)", x: 0 }
+                  : { opacity: 0, filter: "blur(15px)", x: -30 }
+              }
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <h3 className="text-2xl font-semibold text-white mb-6">
@@ -580,7 +610,11 @@ export default function LaunchpadPage() {
                   "inset 4px 4px 16px rgba(239, 68, 68, 0.15), inset -4px -4px 16px rgba(239, 68, 68, 0.15)",
               }}
               initial={{ opacity: 0, filter: "blur(15px)", x: 30 }}
-              animate={isSecurityInView ? { opacity: 1, filter: "blur(0px)", x: 0 } : { opacity: 0, filter: "blur(15px)", x: 30 }}
+              animate={
+                isSecurityInView
+                  ? { opacity: 1, filter: "blur(0px)", x: 0 }
+                  : { opacity: 0, filter: "blur(15px)", x: 30 }
+              }
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <h3 className="text-2xl font-semibold text-white mb-6">
