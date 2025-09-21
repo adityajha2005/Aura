@@ -13,14 +13,62 @@ from typing import Optional, Dict, List
 from pydantic import BaseModel, Field
 import json
 
-from config import Config
-from data_pipeline import (
-    get_live_market_data, get_avax_price, get_volatility,
-    get_enhanced_coingecko_data, get_multi_coin_data, 
-    get_global_market_data, get_market_sentiment, get_cross_asset_analysis
-)
-from production_models import get_production_fee_recommendation, get_model_info, train_production_models
-from contract_scanner import scan_contract_address, quick_risk_assessment
+# Import with error handling for Railway deployment
+try:
+    from config import Config
+except ImportError as e:
+    print(f"Warning: Could not import config: {e}")
+    # Fallback configuration
+    class Config:
+        LOG_LEVEL = "INFO"
+        LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        API_HOST = "0.0.0.0"
+        API_PORT = 8000
+        DEBUG = False
+
+# Import data pipeline functions with error handling
+try:
+    from data_pipeline import (
+        get_live_market_data, get_avax_price, get_volatility,
+        get_enhanced_coingecko_data, get_multi_coin_data, 
+        get_global_market_data, get_market_sentiment, get_cross_asset_analysis
+    )
+    DATA_PIPELINE_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Could not import data_pipeline: {e}")
+    DATA_PIPELINE_AVAILABLE = False
+    # Create dummy functions
+    async def get_live_market_data(): return {}
+    async def get_avax_price(): return 0
+    async def get_volatility(): return 0
+    async def get_enhanced_coingecko_data(): return {}
+    async def get_multi_coin_data(): return {}
+    async def get_global_market_data(): return {}
+    async def get_market_sentiment(): return "neutral"
+    async def get_cross_asset_analysis(): return {}
+
+# Import production models with error handling
+try:
+    from production_models import get_production_fee_recommendation, get_model_info, train_production_models
+    PRODUCTION_MODELS_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Could not import production_models: {e}")
+    PRODUCTION_MODELS_AVAILABLE = False
+    # Create dummy functions
+    async def get_production_fee_recommendation(): return {"recommended_fee": 0.3, "confidence": 0.5, "reasoning": "Fallback mode"}
+    def get_model_info(): return {"status": "unavailable"}
+    async def train_production_models(): return {"status": "unavailable"}
+
+# Import contract scanner with error handling
+try:
+    from contract_scanner import scan_contract_address, quick_risk_assessment
+    CONTRACT_SCANNER_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Could not import contract_scanner: {e}")
+    CONTRACT_SCANNER_AVAILABLE = False
+    # Create dummy functions
+    async def scan_contract_address(address): return {"risk_score": 0.5, "risk_level": "unknown"}
+    async def quick_risk_assessment(address): return {"risk_score": 0.5, "risk_level": "unknown"}
 
 # Setup logging
 logging.basicConfig(level=getattr(logging, Config.LOG_LEVEL), format=Config.LOG_FORMAT)
@@ -240,20 +288,28 @@ async def startup_event():
     """Initialize the application"""
     logger.info("Starting Aura AI Backend...")
     
+    # Log service availability
+    logger.info(f"Data Pipeline Available: {DATA_PIPELINE_AVAILABLE}")
+    logger.info(f"Production Models Available: {PRODUCTION_MODELS_AVAILABLE}")
+    logger.info(f"Contract Scanner Available: {CONTRACT_SCANNER_AVAILABLE}")
+    
     # Validate configuration (non-blocking)
     try:
-        if not Config.validate_config():
+        if hasattr(Config, 'validate_config') and not Config.validate_config():
             logger.warning("Some API keys are missing - functionality may be limited")
     except Exception as e:
         logger.warning(f"Configuration validation failed: {e}")
     
     # Warm up AI models (non-blocking)
-    try:
-        logger.info("Warming up AI models...")
-        # Production models are ready on import
-        logger.info("AI models ready")
-    except Exception as e:
-        logger.warning(f"AI models warmup failed: {e}")
+    if PRODUCTION_MODELS_AVAILABLE:
+        try:
+            logger.info("Warming up AI models...")
+            # Production models are ready on import
+            logger.info("AI models ready")
+        except Exception as e:
+            logger.warning(f"AI models warmup failed: {e}")
+    else:
+        logger.warning("AI models not available - running in fallback mode")
     
     logger.info("Aura AI Backend started successfully")
 
@@ -273,9 +329,9 @@ async def ping():
 async def health_check():
     """Health check endpoint"""
     services = {
-        "ai_models": "healthy",
-        "data_pipeline": "healthy",
-        "contract_scanner": "healthy"
+        "ai_models": "healthy" if PRODUCTION_MODELS_AVAILABLE else "degraded",
+        "data_pipeline": "healthy" if DATA_PIPELINE_AVAILABLE else "degraded",
+        "contract_scanner": "healthy" if CONTRACT_SCANNER_AVAILABLE else "degraded"
     }
     
     # Simple health check - don't test external services during startup
