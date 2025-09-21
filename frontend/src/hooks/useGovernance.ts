@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { formatEther } from "viem";
 import { CONTRACT_ADDRESSES } from "@/config/contracts";
 import GovernanceABI from "@/abis/Governance.json";
@@ -32,9 +37,10 @@ export interface ProposalStatus {
 export function useGovernance() {
   const { address } = useAccount();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
 
   // Read governance contract state
   const { data: proposalCount } = useReadContract({
@@ -59,14 +65,13 @@ export function useGovernance() {
     args: address ? [address] : undefined,
   });
 
-
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Fetch all proposals
   const fetchProposals = useCallback(async () => {
     if (!proposalCount) return;
-    
+
     setLoading(true);
     try {
       // For now, we'll use a simplified approach since we can't use hooks in async functions
@@ -80,7 +85,10 @@ export function useGovernance() {
   }, [proposalCount]);
 
   // Get proposal status
-  const getProposalStatus = async (proposalId: number): Promise<ProposalStatus | null> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const getProposalStatus = async (
+    proposalId: number
+  ): Promise<ProposalStatus | null> => {
     // Simplified implementation - in real app, you'd use a contract reader
     return {
       exists: true,
@@ -93,12 +101,12 @@ export function useGovernance() {
   };
 
   // Check if user has voted on a proposal
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const hasUserVoted = async (proposalId: number): Promise<boolean> => {
     if (!address) return false;
     // Simplified implementation - in real app, you'd use a contract reader
     return false;
   };
-
 
   // Vote on a proposal
   const vote = async (proposalId: number, support: boolean) => {
@@ -148,20 +156,17 @@ export function useGovernance() {
     }
   };
 
-
-
-
   // Format time remaining for voting
   const getTimeRemaining = (endTime: bigint): string => {
     const now = BigInt(Math.floor(Date.now() / 1000));
     const remaining = endTime - now;
-    
+
     if (remaining <= 0) return "Ended";
-    
+
     const days = Number(remaining) / (24 * 60 * 60);
     const hours = (Number(remaining) % (24 * 60 * 60)) / (60 * 60);
     const minutes = (Number(remaining) % (60 * 60)) / 60;
-    
+
     if (days >= 1) {
       return `${Math.floor(days)}d ${Math.floor(hours)}h`;
     } else if (hours >= 1) {
@@ -174,7 +179,7 @@ export function useGovernance() {
   // Get proposal status text
   const getProposalStatusText = (proposal: Proposal): string => {
     const now = BigInt(Math.floor(Date.now() / 1000));
-    
+
     if (proposal.executed) return "Executed";
     if (now < proposal.startTime) return "Upcoming";
     if (now > proposal.endTime) {
@@ -208,7 +213,9 @@ export function useGovernance() {
     proposals,
     proposalCount: proposalCount ? Number(proposalCount) : 0,
     userBalance: userBalance ? formatEther(userBalance as bigint) : "0",
-    userVotingPower: userVotingPower ? formatEther(userVotingPower as bigint) : "0",
+    userVotingPower: userVotingPower
+      ? formatEther(userVotingPower as bigint)
+      : "0",
     loading,
     isPending,
     isConfirming,

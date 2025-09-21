@@ -9,11 +9,21 @@ interface ProposalsListProps {
   onVote: (proposalId: number, support: boolean) => Promise<void>;
   onExecute: (proposalId: number) => Promise<void>;
   isPending: boolean;
+  compact?: boolean;
 }
 
-export default function ProposalsList({ onVote, onExecute, isPending }: ProposalsListProps) {
+export default function ProposalsList({
+  onVote,
+  onExecute,
+  isPending,
+  compact = false,
+}: ProposalsListProps) {
   // Get proposal count
-  const { data: proposalCount, isLoading, error } = useReadContract({
+  const {
+    data: proposalCount,
+    isLoading,
+    error,
+  } = useReadContract({
     address: CONTRACT_ADDRESSES.Governance,
     abi: GovernanceABI,
     functionName: "proposalCount",
@@ -24,28 +34,33 @@ export default function ProposalsList({ onVote, onExecute, isPending }: Proposal
     proposalCount,
     isLoading,
     error,
-    contractAddress: CONTRACT_ADDRESSES.Governance
+    contractAddress: CONTRACT_ADDRESSES.Governance,
   });
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
-        <p className="text-gray-300 mt-4">Loading proposals...</p>
+      <div className="text-center py-8">
+        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
+        <p className="text-gray-300 mt-3 text-sm">Loading proposals...</p>
       </div>
     );
   }
 
   if (!proposalCount || Number(proposalCount) === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 text-lg mb-4">No proposals found</div>
-        <p className="text-gray-500 mb-4">Be the first to create a proposal!</p>
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-blue-400 text-sm">
-            <strong>Debug Info:</strong><br/>
-            Proposal Count: {proposalCount?.toString() || "undefined"}<br/>
-            Loading: {isLoading ? "Yes" : "No"}<br/>
+      <div className="text-center py-8">
+        <div className="text-gray-400 text-base mb-3">No proposals found</div>
+        <p className="text-gray-500 mb-4 text-sm">
+          Be the first to create a proposal!
+        </p>
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+          <p className="text-blue-400 text-xs">
+            <strong>Debug Info:</strong>
+            <br />
+            Proposal Count: {proposalCount?.toString() || "undefined"}
+            <br />
+            Loading: {isLoading ? "Yes" : "No"}
+            <br />
             Error: {error ? error.message : "None"}
           </p>
         </div>
@@ -54,10 +69,13 @@ export default function ProposalsList({ onVote, onExecute, isPending }: Proposal
   }
 
   // Create array of proposal IDs
-  const proposalIds = Array.from({ length: Number(proposalCount) }, (_, i) => i + 1);
+  const proposalIds = Array.from(
+    { length: Number(proposalCount) },
+    (_, i) => i + 1
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {proposalIds.map((proposalId) => (
         <ProposalCard
           key={proposalId}
@@ -65,6 +83,7 @@ export default function ProposalsList({ onVote, onExecute, isPending }: Proposal
           onVote={onVote}
           onExecute={onExecute}
           isPending={isPending}
+          compact={compact}
         />
       ))}
     </div>
