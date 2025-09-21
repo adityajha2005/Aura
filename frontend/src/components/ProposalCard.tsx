@@ -6,6 +6,7 @@ import { formatEther } from "viem";
 import { CONTRACT_ADDRESSES } from "@/config/contracts";
 import GovernanceABI from "@/abis/Governance.json";
 import toast from "react-hot-toast";
+import LoadingSpinner from "./ui/loading-spinner";
 
 interface ProposalData {
   id: number;

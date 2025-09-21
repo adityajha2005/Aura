@@ -8,10 +8,10 @@ interface TooltipProps {
   position?: "top" | "bottom" | "left" | "right";
 }
 
-export default function Tooltip({ 
-  children, 
-  text, 
-  position = "top" 
+export default function Tooltip({
+  children,
+  text,
+  position = "top",
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -53,7 +53,7 @@ export default function Tooltip({
     >
       {children}
       {isVisible && (
-        <div 
+        <div
           className={`absolute ${getPositionClasses()} px-3 py-2 bg-stone-900 text-white text-sm rounded-lg shadow-lg border border-gray-700 whitespace-nowrap z-50 pointer-events-none`}
         >
           {text}

@@ -14,6 +14,7 @@ import {
 } from "@/hooks/useLaunchpad";
 import { LaunchCard } from "@/components/LaunchCard";
 import GlowButton from "@/components/ui/glow-button";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 export default function LaunchpadPage() {
   const [selectedTab, setSelectedTab] = useState("projects");
@@ -239,7 +240,7 @@ export default function LaunchpadPage() {
 
             {loading && (
               <div className="text-center py-8">
-                <div className="text-white">Loading launches...</div>
+                <LoadingSpinner />
               </div>
             )}
 
